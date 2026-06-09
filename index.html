@@ -9,6 +9,10 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css"/>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --linko-orange: #f04a17;
+    --linko-blue: #001b5e;
+  }
 
   body {
     background: radial-gradient(ellipse at 40% 30%, #2a2a2a 0%, #111 50%, #080808 100%);
@@ -25,6 +29,8 @@
     gap: 20px;
     transform: scale(0.92);
     transform-origin: center center;
+    position: relative;
+    z-index: 10;
   }
   .sequence-label {
     font-family: 'DM Sans', sans-serif;
@@ -246,6 +252,13 @@
     align-items: center;
     justify-content: center;
   }
+  .screen.fade-enter {
+    animation: screenFadeIn 0.9s ease both;
+  }
+  @keyframes screenFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
 
   /* ══════════════════════════════
      SCREEN 1 — ONBOARDING
@@ -378,7 +391,37 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 36px;
+    gap: 20px;
+    padding: 104px 28px 34px;
+  }
+  .s2-intro {
+    width: 100%;
+    color: #fff;
+    text-align: left;
+    margin-bottom: 2px;
+    transform: translateY(-60px);
+  }
+  .s2-greeting {
+    font-size: 16px;
+    line-height: 1.06;
+    font-weight: 800;
+    margin-bottom: 10px;
+  }
+  .s2-question {
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.25;
+  color: #fff;
+  max-width: 290px;
+  margin-bottom: 8px;
+  }
+
+  .s2-copy {
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.25;
+  color: rgba(255,255,255,0.88);
+  max-width: 290px;
   }
   /* blob button */
   .big-btn {
@@ -404,21 +447,84 @@
   }
   /* Link text inside button — bounces subtly */
   .big-btn-label {
-    font-size: 22px;
+    font-size: 20px;
     font-weight: 700;
-    color: #e04d0f;
-    letter-spacing: -0.5px;
+    color: var(--linko-orange);
+    letter-spacing: 0;
     animation: labelPulse 3s ease-in-out infinite;
+    white-space: nowrap;
+    transform-origin: center center;
   }
   @keyframes labelPulse {
     0%,100% { transform: scale(1); opacity: 1; }
     50%      { transform: scale(1.08); opacity: 0.9; }
   }
-  .s2-hint {
-    font-size: 15px;
-    color: rgba(255,255,255,0.75);
-    text-align: center;
-    letter-spacing: 0.2px;
+  .s2-hint { display: none; }
+  .preference-panel {
+    width: 100%;
+    display: grid;
+    transform: translateY(50px);
+    gap: 9px;
+  }
+  .segment-row {
+    display: grid;
+    grid-template-columns: 76px 1fr;
+    align-items: center;
+    gap: 8px;
+  }
+  .segment-label {
+    color: rgba(255,255,255,0.9);
+    font-size: 11px;
+    font-weight: 800;
+  }
+  .segment-control {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    padding: 4px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.18);
+    border: 1px solid rgba(255,255,255,0.24);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+  .segment-control button {
+    min-height: 28px;
+    border: none;
+    border-radius: 999px;
+    background: transparent;
+    color: rgba(255,255,255,0.94);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 10.6px;
+    font-weight: 800;
+    cursor: pointer;
+    text-shadow: 0 1px 8px rgba(0,27,94,0.18);
+  }
+  .segment-control button.on {
+    background: var(--linko-orange);
+    color: #fff;
+    box-shadow: 0 6px 16px rgba(0,27,94,0.18);
+  }
+  #oneButtonPreferences {
+    width: min(292px, 100%);
+    align-self: center;
+    margin-top: 24px;
+  }
+  #oneButtonPreferences .segment-row {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  #oneButtonPreferences .segment-label {
+    display: none;
+  }
+  #oneButtonPreferences .segment-control {
+    width: 100%;
+  }
+  #oneButtonPreferences .segment-control button {
+    min-height: 31px;
+    font-size: 12px;
+  }
+  #oneButtonPreferences .segment-control button.on {
+    background: #ff7c00;
   }
   /* ripple rings */
   .ripple-ring {
@@ -442,7 +548,8 @@
     width: 100%; height: 100%;
     display: flex; flex-direction: column;
     align-items: center; justify-content: center;
-    gap: 28px; position: relative;
+    gap: 10px; position: relative;
+    padding: 104px 28px 34px;
   }
   /* blob-anchor: the one center element everything hangs on */
   .blob-anchor {
@@ -582,8 +689,13 @@
   justify-content: center;
   box-shadow: 0 14px 30px rgba(0,27,94,0.28);
   animation: stackBlobPulse 4s ease-in-out infinite;
+  transition: left 0.48s cubic-bezier(0.22,1,0.36,1), opacity 0.36s ease;
   z-index: 4;
 }
+  #s4-overlay.stack-expanded .stack-blob {
+    left: -42px;
+    opacity: 0;
+  }
 
 
   @keyframes stackBlobPulse {
@@ -771,6 +883,17 @@
     line-height: 1.1;
     margin-bottom: 12px;
   }
+  .preference-overview {
+    display: grid;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .preference-overview div {
+    color: rgba(255,255,255,0.9);
+    font-size: 11px;
+    font-weight: 800;
+    line-height: 1.18;
+  }
   .preference-tags {
     display: flex;
     flex-wrap: wrap;
@@ -810,6 +933,9 @@
   .preference-card.expanded .pref-expanded-panel {
     display: block;
   }
+  .preference-card.expanded .pref-control-btn {
+    display: none;
+  }
   .preference-card.expanded .preference-title {
     font-size: 12px;
     margin-bottom: 16px;
@@ -825,6 +951,35 @@
   .preference-card.expanded .preference-tags span {
     font-size: 12px;
     padding: 7px 10px;
+  }
+  .preference-card.expanded .preference-overview,
+  .preference-card.expanded .preference-tags {
+    display: none;
+  }
+  .preference-card .preference-panel {
+    display: none;
+    margin-top: 18px;
+  }
+  .preference-card.expanded .preference-panel {
+    display: grid;
+  }
+  .preference-card .segment-row {
+    grid-template-columns: 78px 1fr;
+  }
+  .preference-card .segment-label {
+    color: rgba(255,255,255,0.78);
+  }
+  .preference-card .segment-control {
+    background: rgba(255,255,255,0.11);
+    border-color: rgba(255,255,255,0.2);
+  }
+  .preference-card .segment-control button {
+    color: rgba(255,255,255,0.74);
+  }
+  .preference-card .segment-control button.on {
+    background: #ff4900;
+    color: #fff;
+    box-shadow: none;
   }
   .pref-expanded-panel .pref-sec {
     color: rgba(255,255,255,0.72);
@@ -936,9 +1091,12 @@
     font-size: 13px;
   }
   .rec-card-shell.expanded .summary-meta {
+    display: flex;
+    margin-top: 14px;
+  }
+  .rec-card-shell.expanded .stack-meta {
     display: none;
   }
-  .rec-card-shell.expanded .stack-meta,
   .rec-card-shell.expanded .card-actions {
     display: flex;
   }
@@ -956,6 +1114,14 @@
     font-size: 22px;
     margin-bottom: 10px;
   }
+  .rec-card-shell.expanded .summary-meta span {
+    font-size: 12px;
+    line-height: 1.22;
+  }
+  .rec-card-shell.expanded {
+    display: flex;
+    flex-direction: column;
+  }
   .card-img {
     display: none;
     width: 100%;
@@ -965,8 +1131,26 @@
     justify-content: center;
     font-size: 52px;
     margin: 14px 0 18px;
+    overflow: hidden;
+    background: rgba(0,27,94,0.06);
   }
-  .rec-card-shell.expanded .card-img { display: flex; }
+  .card-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .rec-card-shell.expanded .card-img {
+    display: flex;
+    height: 196px;
+    min-height: 196px;
+    flex-shrink: 0;
+    margin: auto 0 18px;
+  }
+  .rec-card-shell.expanded .card-actions {
+    margin-top: 0;
+    padding-top: 4px;
+  }
   .card-btn-join { flex: 1.4; padding: 12px 10px !important; font-size: 13px !important; order: 3; }
   .card-btn-sm   { flex: 1;   padding: 11px 8px !important; font-size: 12px !important; white-space: nowrap; }
   .card-actions .btn-primary,
@@ -1190,6 +1374,13 @@
     font-weight: 800;
     box-shadow: 0 14px 26px rgba(0,27,94,0.22);
     flex-shrink: 0;
+    overflow: hidden;
+  }
+  .host-avatar-large img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
   }
   .host-copy { min-width: 0; }
   .host-name {
@@ -1362,14 +1553,22 @@
     min-height: 46px;
   }
   .btn-primary {
-    background: #ff4900; color: #fff;
+    background: var(--linko-blue); color: var(--linko-orange);
     border: none; border-radius: 50px;
     padding: 18px; font-family: 'DM Sans', sans-serif;
-    font-size: 16px; font-weight: 600; cursor: pointer;
+    font-size: 16px; font-weight: 800; cursor: pointer;
     transition: transform 0.1s;
     text-align: center;
+    box-shadow: 0 12px 26px rgba(0,27,94,0.18);
   }
   .btn-primary:active { transform: scale(0.98); }
+  .btn-primary.is-disabled,
+  .create-button.is-disabled {
+    opacity: 0.38;
+    box-shadow: none;
+    cursor: default;
+    pointer-events: none;
+  }
   .btn-ghost {
     background: transparent; color: #001b5e;
     border: 1.5px solid rgba(0,27,94,0.2);
@@ -1570,9 +1769,9 @@
   }
   .feedback-scale button.on,
   .feedback-chips button.on {
-    background: #001b5e;
+    background: var(--linko-orange);
     color: #fff;
-    border-color: #001b5e;
+    border-color: var(--linko-orange);
   }
   .feedback-question {
     color: #001b5e;
@@ -1700,13 +1899,38 @@
   /* ══════════════════════════════
      SCREEN 8/9 — FEEDBACK + CREDIT
   ══════════════════════════════ */
-  #s8, #s9 { background: #f3f3eb; }
+  #s8, #s9 {
+    overflow: hidden;
+    background:
+      radial-gradient(circle at 38% 46%, rgba(255,255,255,0.34) 0%, rgba(255,255,255,0.08) 42%, transparent 68%),
+      linear-gradient(160deg, #ff4900 0%, #ff7c00 55%, #ffb347 100%);
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+  }
+  #s8.active,
+  #s9.active,
+  #s10.active {
+    display: block;
+  }
+  #s8::before,
+  #s9::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(243,243,235,0.34);
+    backdrop-filter: blur(7px);
+    -webkit-backdrop-filter: blur(7px);
+    pointer-events: none;
+    z-index: 0;
+  }
   .flow-hero {
     width: 100%;
-    background: #001b5e;
-    color: #fff;
-    padding: 52px 24px 28px;
+    background: transparent;
+    color: #001b5e;
+    padding: 60px 24px 10px;
     flex-shrink: 0;
+    position: relative;
+    z-index: 1;
   }
   .flow-kicker {
     display: inline-flex;
@@ -1721,22 +1945,33 @@
   }
   .flow-title {
     font-size: 28px;
-    font-weight: 700;
+    font-weight: 800;
     line-height: 1.12;
-    color: #fff;
+    color: #001b5e;
   }
   .flow-body {
     width: 100%;
-    flex: 1;
-    padding: 20px 24px 28px;
+    height: calc(100% - 102px);
+    padding: 10px 18px 26px;
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    position: relative;
+    z-index: 1;
   }
+  .flow-body::-webkit-scrollbar { display: none; }
   .status-card {
-    background: #fff;
-    border-radius: 20px;
+    background: rgba(255,255,255,0.58);
+    border: 1px solid rgba(255,255,255,0.54);
+    border-radius: 26px;
     padding: 18px;
-    margin-bottom: 14px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    margin-bottom: 12px;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.72),
+      inset 0 -18px 34px rgba(255,255,255,0.13),
+      0 18px 42px rgba(0,27,94,0.13);
+    backdrop-filter: blur(18px) saturate(1.16);
+    -webkit-backdrop-filter: blur(18px) saturate(1.16);
   }
   .status-row {
     display: flex;
@@ -1818,7 +2053,7 @@
   .credit-slot {
     aspect-ratio: 1;
     border-radius: 14px;
-    background: rgba(0,27,94,0.07);
+    background: rgba(255,255,255,0.64);
     border: 1px solid rgba(0,27,94,0.08);
     color: rgba(0,27,94,0.3);
     display: flex;
@@ -1827,16 +2062,29 @@
     font-size: 16px;
   }
   .credit-slot.filled {
-    background: #ff4900;
-    border-color: #ff4900;
+    background: rgba(255,255,255,0.82);
+    border-color: rgba(240,74,23,0.24);
     color: #fff;
-    box-shadow: 0 8px 18px rgba(255,73,0,0.22);
+    box-shadow: 0 8px 18px rgba(240,74,23,0.16);
   }
   .credit-slot img {
     width: 22px;
     height: 22px;
     object-fit: contain;
     display: block;
+    filter: grayscale(1) opacity(0.38);
+    transform: scale(0.9);
+    transition: filter 0.28s ease, transform 0.28s ease;
+  }
+  .credit-slot.filled img {
+    filter: none;
+    transform: scale(1);
+    animation: creditStamp 0.48s cubic-bezier(0.18, 1.35, 0.32, 1) both;
+  }
+  @keyframes creditStamp {
+    0% { transform: scale(0.32); opacity: 0.25; }
+    68% { transform: scale(1.18); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
   }
   .unlock-card {
     background:
@@ -1859,6 +2107,292 @@
     font-size: 11px;
     font-weight: 800;
     margin-bottom: 13px;
+  }
+  #s10 {
+    overflow: hidden;
+    background:
+      radial-gradient(circle at 24% 18%, rgba(255,73,0,0.34), transparent 28%),
+      radial-gradient(circle at 88% 78%, rgba(255,179,71,0.22), transparent 26%),
+      linear-gradient(160deg, #001040 0%, #001b5e 52%, #031032 100%);
+    color: #fff;
+  }
+  .create-page {
+    height: 100%;
+    padding: 58px 18px 24px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    transition: opacity 0.42s ease, transform 0.42s ease;
+  }
+  .create-page::-webkit-scrollbar { display: none; }
+  .create-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+  }
+  .create-title {
+    font-size: 27px;
+    line-height: 1.05;
+    font-weight: 800;
+    max-width: 340px;
+    white-space: nowrap;
+    margin-bottom: 10px;
+  }
+  .create-sub {
+    color: rgba(255,255,255,0.68);
+    font-size: 13px;
+    line-height: 1.45;
+    margin-bottom: 18px;
+  }
+  .create-card {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.16);
+    border-radius: 24px;
+    padding: 16px;
+    margin-bottom: 12px;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.12), 0 18px 36px rgba(0,0,0,0.22);
+  }
+  .create-label {
+    color: rgba(255,255,255,0.58);
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    margin-bottom: 9px;
+  }
+  .create-field {
+    color: #fff;
+    font-size: 19px;
+    font-weight: 800;
+    line-height: 1.2;
+  }
+  .create-hint {
+    color: rgba(255,255,255,0.56);
+    font-size: 12px;
+    line-height: 1.42;
+    margin-top: 7px;
+  }
+  .create-chip-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .create-segments {
+    display: grid;
+    gap: 10px;
+  }
+  .create-segments .segment-row {
+    grid-template-columns: 74px 1fr;
+  }
+  .create-segments .segment-label {
+    color: rgba(255,255,255,0.7);
+  }
+  .create-segments .segment-control {
+    background: rgba(255,255,255,0.09);
+    border-color: rgba(255,255,255,0.14);
+  }
+  .create-segments .segment-control button.on {
+    background: var(--linko-orange);
+    color: var(--linko-blue);
+  }
+  .create-chip {
+    border: none;
+    border-radius: 999px;
+    background: rgba(255,73,0,0.18);
+    color: #ff8a42;
+    padding: 9px 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 800;
+  }
+  .create-chip.on {
+    background: var(--linko-orange);
+    color: var(--linko-blue);
+  }
+  .create-actions {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 9px;
+    margin-top: 18px;
+  }
+  .create-button,
+  .create-secondary {
+    border-radius: 999px;
+    padding: 14px 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 800;
+    cursor: pointer;
+  }
+  .create-button {
+    border: none;
+    background: var(--linko-orange);
+    color: var(--linko-blue);
+    box-shadow: 0 16px 30px rgba(255,73,0,0.28);
+  }
+  .create-secondary {
+    background: rgba(255,255,255,0.08);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.18);
+  }
+  .publish-stage {
+    position: absolute;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    z-index: 2;
+  }
+  #s10.publishing .create-page {
+    opacity: 0;
+    transform: scale(0.96);
+    pointer-events: none;
+  }
+  #s10.publishing .publish-stage {
+    display: flex;
+  }
+  .publish-lines {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    animation: publishLinesIn 1.1s ease 0.45s forwards;
+    display: none;
+  }
+  .publish-lines line {
+    stroke: rgba(78,145,255,0.52);
+    stroke-width: 1.4;
+    stroke-linecap: round;
+    stroke-dasharray: 8 10;
+    animation: publishDash 4.2s linear infinite;
+  }
+  .publish-name {
+    position: absolute;
+    color: rgba(255,255,255,0.68);
+    font-size: 11px;
+    font-weight: 800;
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.8);
+    animation: nameBloom 0.7s cubic-bezier(0.18,1.28,0.32,1) forwards;
+    display: none;
+  }
+  .publish-name.major {
+    color: #fff;
+    font-size: 15px;
+  }
+  .publish-orb {
+    position: relative;
+    width: 160px;
+    height: 220px;
+    border: none;
+    border-radius: 80px;
+    background:
+      radial-gradient(circle at 32% 18%, rgba(255,255,255,0.34), transparent 24%),
+      linear-gradient(160deg, #ff8a35 0%, var(--linko-orange) 58%, #c93508 100%);
+    color: var(--linko-blue);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 18px;
+    font-weight: 900;
+    box-shadow: 0 22px 54px rgba(240,74,23,0.3);
+    filter: drop-shadow(0 18px 26px rgba(0,0,0,0.22));
+    cursor: pointer;
+    animation: btnPulse 4s ease-in-out infinite, publishOrbIn 0.72s cubic-bezier(0.22,1,0.36,1) both;
+    z-index: 3;
+    transition: width 0.62s cubic-bezier(0.22,1,0.36,1), height 0.62s cubic-bezier(0.22,1,0.36,1), border-radius 0.62s cubic-bezier(0.22,1,0.36,1), transform 0.62s cubic-bezier(0.22,1,0.36,1), opacity 0.35s ease;
+  }
+  .publish-orb::before {
+    content: "";
+    position: absolute;
+    inset: -10px;
+    border-radius: inherit;
+    background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.22), transparent 62%);
+    opacity: 0.48;
+    z-index: -1;
+  }
+  .publish-orb img {
+    width: 38px;
+    height: 38px;
+    object-fit: contain;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.28s ease;
+  }
+  #s10.publishing .publish-orb.is-finishing {
+    width: 160px;
+    height: 220px;
+    border-radius: 80px;
+    animation: publishOrbShrink 0.78s cubic-bezier(0.22,1,0.36,1) both;
+    box-shadow: 0 18px 42px rgba(240,74,23,0.24), inset 0 1px 0 rgba(255,255,255,0.22);
+    pointer-events: none;
+  }
+  #s10.publishing .publish-orb.is-finishing span {
+    opacity: 0;
+    transform: scale(0.45);
+  }
+  #s10.publishing .publish-orb.is-finishing img {
+    display: none;
+    opacity: 0;
+  }
+  .publish-orb span {
+    transition: opacity 0.3s ease, transform 0.5s cubic-bezier(0.22,1,0.36,1);
+  }
+  .publish-finale {
+    position: absolute;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 24px;
+    text-align: center;
+    color: #fff;
+    font-size: 24px;
+    font-weight: 900;
+    letter-spacing: 0.2px;
+    z-index: 4;
+  }
+  .publish-finale img {
+    width: 178px;
+    max-width: 72%;
+    height: auto;
+    filter: drop-shadow(0 12px 28px rgba(0,0,0,0.18));
+    opacity: 0;
+    transform: scale(0.42);
+  }
+  #s10.published .publish-lines,
+  #s10.published .publish-name,
+  #s10.published .publish-orb {
+    opacity: 0;
+    pointer-events: none;
+  }
+  #s10.published .publish-finale {
+    display: flex;
+    animation: screenFadeIn 0.8s ease both;
+  }
+  #s10.published .publish-finale img {
+    animation: finalLogoGrow 0.78s cubic-bezier(0.18,1.24,0.32,1) 0.08s both;
+  }
+  @keyframes publishLinesIn { to { opacity: 1; } }
+  @keyframes publishDash { to { stroke-dashoffset: -72; } }
+  @keyframes nameBloom { to { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
+  @keyframes publishOrbIn {
+    from { transform: scale(0.72); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+  @keyframes publishOrbShrink {
+    0% { transform: scale(1); opacity: 1; }
+    58% { transform: scale(0.46); opacity: 1; }
+    100% { transform: scale(0.28); opacity: 0; }
+  }
+  @keyframes finalLogoGrow {
+    0% { opacity: 0; transform: scale(0.42); }
+    68% { opacity: 1; transform: scale(1.08); }
+    100% { opacity: 1; transform: scale(1); }
   }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/p5.min.js"></script>
@@ -1897,6 +2431,12 @@
     </div>
 
     <div class="s2-content">
+      <div class="s2-intro">
+        <div class="s2-greeting">Hi, Aaliyah.</div>
+        <div class="s2-question">What feels possible today?</div>
+        <div class="s2-copy">Take one small step to link, go, and belong.</div>
+      </div>
+
       <!-- blob + radar in same anchor -->
       <div class="blob-anchor">
         <!-- radar rings: position:absolute, centered, hidden until connecting -->
@@ -1912,12 +2452,46 @@
         <div class="ripple-ring" id="rr3" style="display:none;position:absolute;"></div>
         <!-- the blob: shrinks in place, icon replaces label -->
         <button class="big-btn" id="bigBtn" onclick="onBigBtn()">
-          <span class="big-btn-label" id="btnLabel">Link</span>
+          <span class="big-btn-label" id="btnLabel">Tap to Link</span>
           <img src="linkoOlogo.png" alt="" id="btnIcon" class="blob-mark" style="display:none;opacity:0;"/>
         </button>
       </div>
 
-      <p class="s2-hint" id="s2Hint">Tap to Link, Go, Belong</p>
+      <div class="preference-panel one-button-preferences" id="oneButtonPreferences">
+        <div class="segment-row">
+          <div class="segment-label">Pressure</div>
+          <div class="segment-control">
+            <button class="on" onclick="selectSegment(this)">Low</button>
+            <button onclick="selectSegment(this)">Medium</button>
+            <button onclick="selectSegment(this)">Social</button>
+          </div>
+        </div>
+        <div class="segment-row">
+          <div class="segment-label">Distance</div>
+          <div class="segment-control">
+            <button class="on" onclick="selectSegment(this)">20 min</button>
+            <button onclick="selectSegment(this)">40 min</button>
+            <button onclick="selectSegment(this)">Any</button>
+          </div>
+        </div>
+        <div class="segment-row">
+          <div class="segment-label">Setting</div>
+          <div class="segment-control">
+            <button class="on" onclick="selectSegment(this)">Indoor</button>
+            <button onclick="selectSegment(this)">Outdoor</button>
+            <button onclick="selectSegment(this)">Either</button>
+          </div>
+        </div>
+        <div class="segment-row">
+          <div class="segment-label">Format</div>
+          <div class="segment-control">
+            <button onclick="selectSegment(this)">1:1</button>
+            <button class="on" onclick="selectSegment(this)">Small group</button>
+            <button onclick="selectSegment(this)">Open group</button>
+          </div>
+        </div>
+      </div>
+      <p class="s2-hint" id="s2Hint"></p>
       <p class="connect-label" id="cLabel" style="opacity:0;">Connecting...</p>
     </div>
   </div>
@@ -1929,7 +2503,6 @@
         <button class="stack-back" onclick="closeMapOverlay()">
           <i class="ti ti-arrow-left"></i>
         </button>
-        <div class="stack-count">3 matched options</div>
       </div>
 
       <div class="stack-blob">
@@ -2109,7 +2682,7 @@
       </div>
       <div class="booking-actions">
         <button class="btn-ghost" onclick="contactHost()">Host contact</button>
-        <button class="btn-primary" onclick="completeActivity()">Complete activity</button>
+        <button class="btn-primary is-disabled" id="completeActivityBtn" onclick="completeActivity()" disabled>Complete activity</button>
       </div>
     </section>
   </div>
@@ -2153,7 +2726,7 @@
       </div>
       <div class="feedback-actions">
         <button class="btn-ghost" onclick="submitFeedback()">Skip</button>
-        <button class="btn-primary" onclick="submitFeedback()">Submit feedback</button>
+        <button class="btn-primary is-disabled" id="submitFeedbackBtn" onclick="submitFeedback()" disabled>Submit feedback</button>
       </div>
     </div>
   </div>
@@ -2170,16 +2743,16 @@
           <span>/ 10 credits</span>
         </div>
         <div class="credit-slots">
-          <div class="credit-slot filled"><img src="linkoOlogoWhite.png" alt=""></div>
-          <div class="credit-slot filled"><img src="linkoOlogoWhite.png" alt=""></div>
-          <div class="credit-slot filled"><img src="linkoOlogoWhite.png" alt=""></div>
-          <div class="credit-slot filled"><img src="linkoOlogoWhite.png" alt=""></div>
-          <div class="credit-slot filled"><img src="linkoOlogoWhite.png" alt=""></div>
-          <div class="credit-slot filled"><img src="linkoOlogoWhite.png" alt=""></div>
-          <div class="credit-slot filled"><img src="linkoOlogoWhite.png" alt=""></div>
-          <div class="credit-slot filled"><img src="linkoOlogoWhite.png" alt=""></div>
-          <div class="credit-slot filled"><img src="linkoOlogoWhite.png" alt=""></div>
-          <div class="credit-slot filled"><img src="linkoOlogoWhite.png" alt=""></div>
+          <div class="credit-slot"><img src="linkoOlogo.png" alt=""></div>
+          <div class="credit-slot"><img src="linkoOlogo.png" alt=""></div>
+          <div class="credit-slot"><img src="linkoOlogo.png" alt=""></div>
+          <div class="credit-slot"><img src="linkoOlogo.png" alt=""></div>
+          <div class="credit-slot"><img src="linkoOlogo.png" alt=""></div>
+          <div class="credit-slot"><img src="linkoOlogo.png" alt=""></div>
+          <div class="credit-slot"><img src="linkoOlogo.png" alt=""></div>
+          <div class="credit-slot"><img src="linkoOlogo.png" alt=""></div>
+          <div class="credit-slot"><img src="linkoOlogo.png" alt=""></div>
+          <div class="credit-slot"><img src="linkoOlogo.png" alt=""></div>
         </div>
       </div>
       <div class="status-card unlock-card">
@@ -2191,7 +2764,117 @@
       </div>
       <div class="credit-actions">
         <button class="btn-ghost" onclick="goTo('s2')">Find another activity</button>
-        <button class="btn-primary" onclick="alert('Create Linko flow opened!')">Create Activity</button>
+        <button class="btn-primary is-disabled" id="createActivityBtn" onclick="goTo('s10')" disabled>Create Activity</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ S10: CREATE ACTIVITY ═══ -->
+  <div class="screen" id="s10">
+    <div class="create-page">
+      <div class="create-top">
+        <button class="icon-btn" onclick="goTo('s9')"><i class="ti ti-arrow-left"></i></button>
+      </div>
+      <h2 class="create-title">Host a gentle Linko</h2>
+      <p class="create-sub">Use your credits to help others link, go, and belong.</p>
+
+      <section class="create-card">
+        <div class="create-label">Activity idea</div>
+        <div class="create-field">Quiet tea and sketch table</div>
+        <div class="create-hint">A simple hosted table where people can arrive softly, draw, chat a little, or just sit nearby.</div>
+      </section>
+
+      <section class="create-card">
+        <div class="create-label">Set up</div>
+        <div class="create-segments">
+          <div class="segment-row">
+            <div class="segment-label">Pressure</div>
+            <div class="segment-control">
+              <button class="on" onclick="selectSegment(this)">Low</button>
+              <button onclick="selectSegment(this)">Medium</button>
+              <button onclick="selectSegment(this)">Social</button>
+            </div>
+          </div>
+          <div class="segment-row">
+            <div class="segment-label">Distance</div>
+            <div class="segment-control">
+              <button class="on" onclick="selectSegment(this)">20 min</button>
+              <button onclick="selectSegment(this)">40 min</button>
+              <button onclick="selectSegment(this)">Any</button>
+            </div>
+          </div>
+          <div class="segment-row">
+            <div class="segment-label">Format</div>
+            <div class="segment-control">
+              <button onclick="selectSegment(this)">1:1</button>
+              <button class="on" onclick="selectSegment(this)">Small</button>
+              <button onclick="selectSegment(this)">Open</button>
+            </div>
+          </div>
+          <div class="segment-row">
+            <div class="segment-label">Support</div>
+            <div class="segment-control">
+              <button onclick="selectSegment(this)">Self-led</button>
+              <button class="on" onclick="selectSegment(this)">Host intro</button>
+              <button onclick="selectSegment(this)">Link worker</button>
+            </div>
+          </div>
+          <div class="segment-row">
+            <div class="segment-label">Access</div>
+            <div class="segment-control">
+              <button class="on" onclick="selectSegment(this)">Step-free</button>
+              <button onclick="selectSegment(this)">Low sensory</button>
+              <button onclick="selectSegment(this)">Guidance</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="create-card">
+        <div class="create-label">Host note</div>
+        <div class="create-field">I'll meet people at the entrance.</div>
+        <div class="create-hint">Add the first reassurance people will see before they decide to join.</div>
+      </section>
+
+      <div class="create-actions">
+        <button class="create-secondary" onclick="goTo('s9')">Save draft</button>
+        <button class="create-button" onclick="publishLinko()">Publish Linko</button>
+      </div>
+    </div>
+    <div class="publish-stage" id="publishStage">
+      <svg class="publish-lines" viewBox="0 0 390 844" preserveAspectRatio="none" aria-hidden="true">
+        <line x1="195" y1="422" x2="76" y2="160"></line>
+        <line x1="195" y1="422" x2="296" y2="142"></line>
+        <line x1="195" y1="422" x2="62" y2="292"></line>
+        <line x1="195" y1="422" x2="330" y2="296"></line>
+        <line x1="195" y1="422" x2="72" y2="528"></line>
+        <line x1="195" y1="422" x2="322" y2="536"></line>
+        <line x1="195" y1="422" x2="98" y2="704"></line>
+        <line x1="195" y1="422" x2="288" y2="716"></line>
+        <line x1="195" y1="422" x2="194" y2="104"></line>
+        <line x1="195" y1="422" x2="194" y2="750"></line>
+        <line x1="195" y1="422" x2="338" y2="426"></line>
+        <line x1="195" y1="422" x2="48" y2="424"></line>
+      </svg>
+      <span class="publish-name major" style="left:76px;top:160px;animation-delay:.16s;">Arthur</span>
+      <span class="publish-name major" style="left:296px;top:142px;animation-delay:.24s;">Jahanara</span>
+      <span class="publish-name major" style="left:62px;top:292px;animation-delay:.32s;">Elena</span>
+      <span class="publish-name major" style="left:330px;top:296px;animation-delay:.40s;">Mark</span>
+      <span class="publish-name major" style="left:72px;top:528px;animation-delay:.48s;">James</span>
+      <span class="publish-name" style="left:322px;top:536px;animation-delay:.56s;">Yoon</span>
+      <span class="publish-name" style="left:98px;top:704px;animation-delay:.64s;">Genie</span>
+      <span class="publish-name" style="left:288px;top:716px;animation-delay:.72s;">Ji Su</span>
+      <span class="publish-name" style="left:194px;top:104px;animation-delay:.80s;">Avik</span>
+      <span class="publish-name" style="left:194px;top:750px;animation-delay:.88s;">Andy</span>
+      <span class="publish-name" style="left:338px;top:426px;animation-delay:.96s;">Maya</span>
+      <span class="publish-name" style="left:48px;top:424px;animation-delay:1.04s;">Theo</span>
+      <button class="publish-orb" onclick="finishPublishedLinko()">
+        <span>Tap to Link</span>
+        <img src="linkoOlogo2.png" alt="">
+      </button>
+      <div class="publish-finale" id="publishFinale">
+        <img src="LinkoLogoOrange.png" alt="Linko">
+        <div>Link, Go, Belong</div>
       </div>
     </div>
   </div>
@@ -2202,6 +2885,7 @@
   const ACTIVITIES = [
     {
       pill:'Community', title:'Community Garden Session',
+      image:'Community Garden Session.jpg',
       metas:[
         {icon:'ti-clock',       text:'Tuesdays 10 am – 11:30 am'},
         {icon:'ti-map-pin',     text:'15 min away · Hackney City Farm'},
@@ -2213,6 +2897,7 @@
     },
     {
       pill:'Social', title:'Café Chat Morning',
+      image:'Café Chat Morning.jpg',
       metas:[
         {icon:'ti-clock',      text:'Wednesdays 9 am – 10 am'},
         {icon:'ti-map-pin',    text:'8 min away · The Common Room'},
@@ -2224,6 +2909,7 @@
     },
     {
       pill:'Creative', title:'Community Art Club',
+      image:'Community Art Club.jpg',
       metas:[
         {icon:'ti-clock',      text:'Thursdays 2 pm – 4 pm'},
         {icon:'ti-map-pin',    text:'20 min away · Bethnal Green'},
@@ -2235,6 +2921,7 @@
     },
     {
       pill:'Wellbeing', title:'Gentle Walking Group',
+      image:'',
       metas:[
         {icon:'ti-clock',      text:'Fridays 11 am – 12 pm'},
         {icon:'ti-map-pin',    text:'12 min away · London Fields'},
@@ -2246,6 +2933,7 @@
     },
     {
       pill:'Skills', title:'Library Digital Drop-in',
+      image:'',
       metas:[
         {icon:'ti-clock',      text:'Mondays 1 pm – 2:30 pm'},
         {icon:'ti-map-pin',    text:'10 min away · Hackney Library'},
@@ -2291,6 +2979,7 @@
       hostName: 'Maria S.',
       hostRole: 'Community host · 42 sessions',
       hostInitial: 'M',
+      hostImage: '',
       intro: 'Maria keeps the first step calm: she meets people at the entrance, explains the flow quietly, and makes it easy to join without pressure.',
       trust: ['4.9 host rating', 'Linko verified'],
       summary: 'A small outdoor session with gentle garden tasks, a clear host, and no pressure to talk before you feel ready.',
@@ -2302,6 +2991,7 @@
       hostName: 'Nadia R.',
       hostRole: 'Cafe connector · 27 sessions',
       hostInitial: 'N',
+      hostImage: '',
       intro: 'Nadia sets up a quiet table near the window and keeps introductions optional, so you can arrive, sit down, and ease in slowly.',
       trust: ['4.8 host rating', 'Low-pressure setup'],
       summary: 'A shorter public session with free coffee, a visible host table, and a casual rhythm that is easy to leave if needed.',
@@ -2313,6 +3003,7 @@
       hostName: 'Theo K.',
       hostRole: 'Creative facilitator · 35 sessions',
       hostInitial: 'T',
+      hostImage: 'Theo K.jpg',
       intro: 'Theo starts with materials already laid out, so the activity gives everyone something to focus on before conversation begins.',
       trust: ['4.9 host rating', 'Beginner friendly'],
       summary: 'A side-by-side creative session for trying simple materials, sharing space, and joining conversation only when it feels natural.',
@@ -2324,6 +3015,7 @@
       hostName: 'Aisha P.',
       hostRole: 'Walking host · 31 sessions',
       hostInitial: 'A',
+      hostImage: '',
       intro: 'Aisha keeps the pace slow and checks in quietly at the start, with room to walk beside the group without needing to chat.',
       trust: ['4.8 host rating', 'Gentle pace'],
       summary: 'A calm outdoor route with a small group, clear start point, and plenty of space to participate quietly.',
@@ -2335,6 +3027,7 @@
       hostName: 'Sam L.',
       hostRole: 'Digital support lead · 51 sessions',
       hostInitial: 'S',
+      hostImage: '',
       intro: 'Sam keeps the session practical and structured, with one-to-one support available if you prefer focused help over group chat.',
       trust: ['4.9 host rating', 'Practical support'],
       summary: 'An indoor skills session for simple digital tasks, with a clear queue, seated support, and no expectation to socialise.',
@@ -2352,6 +3045,7 @@
     s6: 'Belonging',
     s8: 'Feedback',
     s9: 'Credits Earned, Now a Contributor',
+    s10: 'Create Activity',
   };
   function updateSeqLabel(text) {
     const lbl = document.getElementById('seqLabel');
@@ -2362,10 +3056,36 @@
   function goTo(id) {
     const target = document.getElementById(id);
     if (!target) return;
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active', 'fade-enter'));
     target.classList.add('active');
+    if (id !== 's1') target.classList.add('fade-enter');
     target.scrollTop = 0;
+    if (id === 's2') restoreOneButtonView();
+    if (id === 's6') startBelongingAnimation();
+    if (id === 's8') startFeedbackAnimation();
+    if (id === 's9') animateCreditsAdded();
+    if (id === 's10') resetCreatePage();
     if (SEQ_LABELS[id]) updateSeqLabel(SEQ_LABELS[id]);
+  }
+
+  function restoreOneButtonView() {
+    const intro = document.querySelector('.s2-intro');
+    const prefsPanel = document.getElementById('oneButtonPreferences');
+    const label = document.getElementById('btnLabel');
+    if (intro) {
+      intro.style.opacity = '1';
+      intro.style.transform = 'translateY(-60px)';
+    }
+    if (prefsPanel) {
+      prefsPanel.style.opacity = '1';
+      prefsPanel.style.transform = 'translateY(50px)';
+    }
+    if (label) {
+      label.textContent = 'Tap to Link';
+      label.style.transform = 'scale(1)';
+      label.style.opacity = '1';
+      label.style.display = 'block';
+    }
   }
 
   function returnToRecommendations() {
@@ -2381,6 +3101,8 @@
     const hint   = document.getElementById('s2Hint');
     const cLabel = document.getElementById('cLabel');
     const radar  = document.getElementById('radarWrap');
+    const intro  = document.querySelector('.s2-intro');
+    const prefsPanel = document.getElementById('oneButtonPreferences');
 
     btn.onclick = null;
     triggerAlgoViz();
@@ -2393,7 +3115,11 @@
     btn.style.borderRadius = '40px';
 
     // swap label → icon at midpoint
-    setTimeout(() => { label.style.transition = 'opacity 0.2s'; label.style.opacity = '0'; }, 200);
+    setTimeout(() => {
+      label.style.transition = 'opacity 0.32s ease, transform 0.6s cubic-bezier(0.22,1,0.36,1)';
+      label.style.transform = 'scale(0.48)';
+      label.style.opacity = '0';
+    }, 120);
     setTimeout(() => {
       label.style.display = 'none';
       icon.style.display  = 'block';
@@ -2406,6 +3132,16 @@
     setTimeout(() => {
       hint.style.transition  = 'opacity 0.4s';
       hint.style.opacity     = '0';
+      if (intro) {
+        intro.style.transition = 'opacity 0.45s ease, transform 0.45s ease';
+        intro.style.opacity = '0';
+        intro.style.transform = 'translateY(-8px)';
+      }
+      if (prefsPanel) {
+        prefsPanel.style.transition = 'opacity 0.45s ease, transform 0.45s ease';
+        prefsPanel.style.opacity = '0';
+        prefsPanel.style.transform = 'translateY(8px)';
+      }
       radar.style.opacity    = '1';
       cLabel.style.opacity   = '1';
       startConnecting();
@@ -2460,16 +3196,28 @@
     const cLabel = document.getElementById('cLabel');
     const radar  = document.getElementById('radarWrap');
     const cont   = document.getElementById('orbitTags');
+    const intro  = document.querySelector('.s2-intro');
+    const prefsPanel = document.getElementById('oneButtonPreferences');
 
     btn.style.transition   = 'none';
     btn.style.width        = '160px';
     btn.style.height       = '220px';
     btn.style.borderRadius = '80px';
     btn.style.animation    = 'btnPulse 4s ease-in-out infinite';
+    label.textContent      = 'Tap to Link';
     label.style.display    = 'block';
     label.style.opacity    = '1';
+    label.style.transform  = 'scale(1)';
     icon.style.display     = 'none';
     hint.style.opacity     = '1';
+    if (intro) {
+      intro.style.opacity = '1';
+      intro.style.transform = 'translateY(-60px)';
+    }
+    if (prefsPanel) {
+      prefsPanel.style.opacity = '1';
+      prefsPanel.style.transform = 'translateY(50px)';
+    }
     radar.style.opacity    = '0';
     cLabel.style.opacity   = '0';
     cLabel.textContent     = 'Connecting...';
@@ -2491,10 +3239,66 @@
     'linear-gradient(135deg,#e8f5e9,#a5d6a7)',
     'linear-gradient(135deg,#e3f2fd,#90caf9)',
   ];
+  const PREFERENCE_GROUPS = [
+    { label: 'Pressure', options: ['Low', 'Medium', 'Social'], active: 0 },
+    { label: 'Distance', options: ['20 min', '40 min', 'Any'], active: 0 },
+    { label: 'Setting', options: ['Indoor', 'Outdoor', 'Either'], active: 0 },
+    { label: 'Format', options: ['1:1', 'Small group', 'Open group'], active: 1 },
+  ];
+  const DETAIL_PREFERENCE_GROUPS = [
+    { label: 'Cost', options: ['Free', 'Low-cost', 'Any'], active: 0 },
+    { label: 'Support', options: ['Self-led', 'Host intro', 'Link worker'], active: 1 },
+    { label: 'Time', options: ['Morning', 'Afternoon', 'Evening'], active: 0 },
+    { label: 'Access', options: ['Step-free', 'Low sensory', 'Clear guidance'], active: 0 },
+  ];
+
+  function getOneButtonPreferences() {
+    const rows = Array.from(document.querySelectorAll('#oneButtonPreferences .segment-row'));
+    if (!rows.length) {
+      return PREFERENCE_GROUPS.map(group => ({
+        label: group.label,
+        value: group.options[group.active]
+      }));
+    }
+    return rows.map((row, index) => ({
+      label: PREFERENCE_GROUPS[index]?.label || '',
+      value: row.querySelector('.segment-control button.on')?.textContent.trim() || PREFERENCE_GROUPS[index]?.options[PREFERENCE_GROUPS[index]?.active || 0] || ''
+    })).filter(item => item.label && item.value);
+  }
+
+  function renderPreferenceControls(includeDetails = false) {
+    const current = getOneButtonPreferences();
+    const baseGroups = PREFERENCE_GROUPS.map((group, groupIndex) => {
+      const currentValue = current[groupIndex]?.value;
+      const activeIndex = Math.max(0, group.options.indexOf(currentValue));
+      return { ...group, active: activeIndex >= 0 ? activeIndex : group.active };
+    });
+    const groups = includeDetails ? baseGroups.concat(DETAIL_PREFERENCE_GROUPS) : baseGroups;
+    return groups.map(group => `
+      <div class="segment-row">
+        <div class="segment-label">${group.label}</div>
+        <div class="segment-control">
+          ${group.options.map((option, index) => `
+            <button class="${index === group.active ? 'on' : ''}" onclick="event.stopPropagation();selectSegment(this)">${option}</button>
+          `).join('')}
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function selectSegment(button) {
+    const group = button.closest('.segment-control');
+    if (!group) return;
+    group.querySelectorAll('button').forEach(btn => btn.classList.remove('on'));
+    button.classList.add('on');
+  }
 
   function renderStackCards() {
     const cont = document.getElementById('stackCards');
     if (!cont) return;
+    const currentPrefs = getOneButtonPreferences();
+    const prefSummary = currentPrefs.map(item => `<div>${item.label}: ${item.value}</div>`).join('');
+    const prefTags = currentPrefs.map(item => `<span>${item.value}</span>`).join('');
     const expandedSlot = selectedStackIdx === null ? -1 : visibleStackIdxs.indexOf(selectedStackIdx);
     cont.className = 'stack-cards' +
       (expandedSlot >= 0 ? ` is-expanded expanded-slot-${expandedSlot}` : '') +
@@ -2512,38 +3316,18 @@
       if (!prefs.classList.contains('expanded')) openPreferenceDetail();
     };
     prefs.innerHTML = `
-      <div class="preference-title">Current settings</div>
-      <strong>Gentle nearby support</strong>
+      <div class="preference-title">Current setting</div>
+      <div class="preference-overview">
+        ${prefSummary}
+      </div>
       <div class="preference-tags">
-        <span>15-20 min</span>
-        <span>Morning</span>
-        <span>Small group</span>
-        <span>Indoor/outdoor</span>
-        <span>Step-free</span>
-        <span>Low talk</span>
+        ${prefTags}
       </div>
       <button class="pref-control-btn" onclick="event.stopPropagation();openPreferenceDetail()">
         <i class="ti ti-adjustments-horizontal"></i> Preferences
       </button>
       <div class="pref-expanded-panel">
-        <div class="pref-sec">Session length</div>
-        <div class="pref-chips">
-          <button class="pref-chip on" onclick="event.stopPropagation();this.classList.toggle('on')">15-20 min</button>
-          <button class="pref-chip" onclick="event.stopPropagation();this.classList.toggle('on')">30-45 min</button>
-          <button class="pref-chip" onclick="event.stopPropagation();this.classList.toggle('on')">Flexible</button>
-        </div>
-        <div class="pref-sec">Time of day</div>
-        <div class="pref-chips">
-          <button class="pref-chip on" onclick="event.stopPropagation();this.classList.toggle('on')">Morning</button>
-          <button class="pref-chip" onclick="event.stopPropagation();this.classList.toggle('on')">Afternoon</button>
-          <button class="pref-chip" onclick="event.stopPropagation();this.classList.toggle('on')">Evening</button>
-        </div>
-        <div class="pref-sec">Setting</div>
-        <div class="pref-chips">
-          <button class="pref-chip on" onclick="event.stopPropagation();this.classList.toggle('on')">Indoor/outdoor</button>
-          <button class="pref-chip" onclick="event.stopPropagation();this.classList.toggle('on')">Indoor only</button>
-          <button class="pref-chip" onclick="event.stopPropagation();this.classList.toggle('on')">Outdoor only</button>
-        </div>
+        <div class="preference-panel">${renderPreferenceControls(true)}</div>
       </div>
     `;
     cont.appendChild(prefs);
@@ -2569,7 +3353,7 @@
         <h3>${a.title}</h3>
         <p class="stack-summary">${framing.summary}</p>
         <div class="summary-meta">
-          ${a.metas.slice(0,4).map(m => `
+          ${a.metas.slice(0,6).map(m => `
             <span><i class="ti ${m.icon}"></i>${m.text}</span>
           `).join('')}
         </div>
@@ -2579,11 +3363,13 @@
             <span class="stack-chip"><i class="ti ${m.icon}"></i>${m.text}</span>
           `).join('')}
         </div>
-        <div class="card-img" style="background:${ACTIVITY_COLORS[idx]||ACTIVITY_COLORS[0]}">${ACTIVITY_EMOJIS[idx]||'🌟'}</div>
+        <div class="card-img" style="background:${ACTIVITY_COLORS[idx]||ACTIVITY_COLORS[0]}">
+          ${a.image ? `<img src="${a.image}" alt="${a.title}">` : `${ACTIVITY_EMOJIS[idx]||'🌟'}`}
+        </div>
         <div class="card-actions">
           <button class="btn-ghost card-btn-sm" onclick="replaceStackOption(event,${idx})">Not now</button>
           <button class="btn-primary card-btn-join" onclick="joinStackOption(event,${idx})">Join</button>
-          <button class="btn-ghost card-btn-sm" onclick="replaceStackOption(event,${idx})">Easier?</button>
+          <button class="btn-ghost card-btn-sm" onclick="replaceStackOption(event,${idx})">Another</button>
         </div>
       `;
       cont.appendChild(card);
@@ -2596,6 +3382,7 @@
     const overlay = document.getElementById('s4-overlay');
     selectedStackIdx = null;
     isPreferenceExpanded = false;
+    overlay.classList.remove('stack-expanded');
     if (visibleStackIdxs.length < 3) visibleStackIdxs = [0, 1, 2];
     renderStackCards();
 
@@ -2616,11 +3403,12 @@
     setTimeout(() => overlay.classList.remove('entering'), 1450);
   }
 
-  function closeMapOverlay() {
+  function closeMapOverlay(resetLabel = true) {
     const overlay = document.getElementById('s4-overlay');
-    overlay.classList.remove('visible', 'entering');
+    overlay.classList.remove('visible', 'entering', 'stack-expanded');
     overlay.onclick = null;
     closeMapDetail();
+    if (resetLabel) updateSeqLabel('ONE BUTTON TO CONNECT');
 
     setTimeout(() => {
       overlay.style.display = 'none';
@@ -2635,6 +3423,7 @@
     const cont = document.getElementById('stackCards');
     const slot = visibleStackIdxs.indexOf(idx);
     const card = document.querySelector(`.rec-card-shell[data-slot="${slot}"]`);
+    document.getElementById('s4-overlay')?.classList.add('stack-expanded');
     if (!cont || !card) {
       renderStackCards();
       return;
@@ -2655,6 +3444,7 @@
     isPreferenceExpanded = true;
     const cont = document.getElementById('stackCards');
     const prefs = document.querySelector('.preference-card');
+    document.getElementById('s4-overlay')?.classList.add('stack-expanded');
     if (!cont || !prefs) {
       renderStackCards();
       return;
@@ -2673,6 +3463,8 @@
     const firstRect = el.getBoundingClientRect();
     selectedStackIdx = null;
     isPreferenceExpanded = false;
+    document.getElementById('s4-overlay')?.classList.remove('stack-expanded');
+    updateSeqLabel('THREE ACTIVITIES MATCHED');
     cont.className = 'stack-cards';
     el.classList.remove('expanded');
     document.querySelectorAll('.rec-card-shell.dimmed').forEach(c => c.classList.remove('dimmed'));
@@ -2687,6 +3479,7 @@
   function closeMapDetail() {
     selectedStackIdx = null;
     isPreferenceExpanded = false;
+    document.getElementById('s4-overlay')?.classList.remove('stack-expanded');
     const cont = document.getElementById('stackCards');
     if (cont) cont.className = 'stack-cards';
   }
@@ -2716,7 +3509,7 @@
       return;
     }
     openDetail(currentMapIdx);
-    closeMapOverlay();
+    closeMapOverlay(false);
     goTo('s5');
   }
 
@@ -2835,7 +3628,9 @@
     const detail = DETAIL_CONTENT[idx] || DETAIL_CONTENT[0];
     const placeInfo = getPlaceInfo(a);
     document.getElementById('detTitle').textContent = a.title;
-    document.getElementById('hostAvatar').textContent = detail.hostInitial;
+    document.getElementById('hostAvatar').innerHTML = detail.hostImage
+      ? `<img src="${detail.hostImage}" alt="${detail.hostName}">`
+      : detail.hostInitial;
     document.getElementById('hostName').textContent = detail.hostName;
     document.getElementById('hostRole').textContent = detail.hostRole;
     document.getElementById('hostIntroText').textContent = detail.intro;
@@ -2901,13 +3696,65 @@
     `;
   }
 
+  function setButtonEnabled(button, enabled) {
+    if (!button) return;
+    button.disabled = !enabled;
+    button.classList.toggle('is-disabled', !enabled);
+  }
+
+  function stopAlgoViz() {
+    const overlay = document.getElementById('algo-overlay');
+    if (overlay) overlay.style.opacity = '0';
+    if (algoSketch) {
+      algoSketch.remove();
+      algoSketch = null;
+    }
+  }
+
+  function startBelongingAnimation() {
+    const btn = document.getElementById('completeActivityBtn');
+    setButtonEnabled(btn, false);
+    triggerAlgoViz('belonging');
+    window.clearTimeout(window.__belongingReadyTimer);
+    window.__belongingReadyTimer = window.setTimeout(() => setButtonEnabled(btn, true), 4300);
+  }
+
+  function startFeedbackAnimation() {
+    const btn = document.getElementById('submitFeedbackBtn');
+    setButtonEnabled(btn, false);
+    triggerAlgoViz('feedback');
+    window.clearTimeout(window.__feedbackReadyTimer);
+    window.__feedbackReadyTimer = window.setTimeout(() => setButtonEnabled(btn, true), 3600);
+  }
+
+  function animateCreditsAdded() {
+    stopAlgoViz();
+    const slots = Array.from(document.querySelectorAll('#s9 .credit-slot'));
+    const createBtn = document.getElementById('createActivityBtn');
+    slots.forEach(slot => slot.classList.remove('filled'));
+    setButtonEnabled(createBtn, false);
+    slots.slice(0, 8).forEach(slot => slot.classList.add('filled'));
+    window.clearTimeout(window.__creditStampTimer);
+    window.__creditStampTimer = window.setTimeout(() => slots[8]?.classList.add('filled'), 520);
+    window.clearTimeout(window.__creditStampTimer2);
+    window.__creditStampTimer2 = window.setTimeout(() => {
+      slots[9]?.classList.add('filled');
+      setButtonEnabled(createBtn, true);
+    }, 1040);
+  }
+
+  function resetCreatePage() {
+    stopAlgoViz();
+    const screen = document.getElementById('s10');
+    if (!screen) return;
+    screen.classList.remove('publishing', 'published');
+    document.querySelector('.publish-orb')?.classList.remove('is-finishing');
+    const lbl = document.getElementById('seqLabel');
+    if (lbl) lbl.style.opacity = '1';
+  }
+
   function completeActivity() {
-  const overlay = document.getElementById('algo-overlay');
-  if (overlay) overlay.style.opacity = '0';
-  setTimeout(() => {
-    if (algoSketch) { algoSketch.remove(); algoSketch = null; }
-  }, 2400);
-  goTo('s8');
+    goTo('s8');
   }
 
   function selectFeedback(button) {
@@ -2917,6 +3764,29 @@
 
   function submitFeedback() {
     goTo('s9');
+  }
+
+  function publishLinko() {
+    stopAlgoViz();
+    const screen = document.getElementById('s10');
+    if (!screen) return;
+    screen.classList.remove('published');
+    document.querySelector('.publish-orb')?.classList.remove('is-finishing');
+    screen.classList.add('publishing');
+    updateSeqLabel('Host a gentle Linko');
+  }
+
+  function finishPublishedLinko() {
+    const screen = document.getElementById('s10');
+    if (!screen) return;
+    const orb = document.querySelector('.publish-orb');
+    const lbl = document.getElementById('seqLabel');
+    if (lbl) lbl.style.opacity = '0';
+    orb?.classList.add('is-finishing');
+    triggerAlgoViz('publish');
+    setTimeout(() => {
+      screen.classList.add('published');
+    }, 980);
   }
 
   // 스플래시: 페이드인 → 유지 → 페이드아웃 → 전환
@@ -2936,10 +3806,66 @@
     return () => { s = s * 16807 % 2147483647; return (s - 1) / 2147483646; };
   }
 
-  const ANCHOR_LABELS = ['NHS', 'GP', 'LOTI', 'User Data', 'VCSE', 'Local Community'];
+  const ALGO_MODES = {
+    connect: {
+      left: ['NHS', 'GP', 'LOTI'],
+      right: ['User Data', 'VCSE', 'Local Community'],
+      color: [240, 74, 23],
+      core: [255, 197, 142],
+      count: 190,
+      y: [0.25, 0.5, 0.75]
+    },
+    belonging: {
+      left: ['Contributor User', 'VCSE', 'Local Community'],
+      right: ['User'],
+      color: [240, 74, 23],
+      core: [255, 210, 162],
+      count: 150,
+      leftY: [0.25, 0.5, 0.75],
+      rightY: [0.5],
+      rightOut: true,
+      rightDelay: 950
+    },
+    feedback: {
+      left: ['User'],
+      right: ['User data', 'NHS', 'VCSE', 'Local community'],
+      color: [240, 74, 23],
+      core: [255, 210, 162],
+      count: 140,
+      leftY: [0.5],
+      rightY: [0.16, 0.38, 0.62, 0.84],
+      rightOut: true,
+      rightDelay: 260
+    },
+    publish: {
+      left: [],
+      right: [],
+      points: [
+        { label: 'Yoon', side: 'L', y: 0.10, xOffset: 20 },
+        { label: 'Maya', side: 'L', y: 0.21, xOffset: 56 },
+        { label: 'Arthur', side: 'L', y: 0.34, xOffset: -16 },
+        { label: 'Kim', side: 'L', y: 0.47, xOffset: 40 },
+        { label: 'Genie', side: 'L', y: 0.61, xOffset: -48 },
+        { label: 'Samir', side: 'L', y: 0.78, xOffset: 58 },
+        { label: 'Nina', side: 'L', y: 0.90, xOffset: 114 },
+        { label: 'Jahanara', side: 'R', y: 0.09, xOffset: -72 },
+        { label: 'Avik', side: 'R', y: 0.22, xOffset: 26 },
+        { label: 'Elena', side: 'R', y: 0.37, xOffset: 98 },
+        { label: 'Mark', side: 'R', y: 0.54, xOffset: 42 },
+        { label: 'Theo', side: 'R', y: 0.72, xOffset: 86 },
+        { label: 'James', side: 'R', y: 0.88, xOffset: -26 }
+      ],
+      major: ['Arthur', 'Jahanara', 'Elena', 'Mark', 'James'],
+      color: [78, 145, 255],
+      core: [178, 214, 255],
+      count: 105,
+      allOut: true
+    }
+  };
   let algoSketch = null;
 
-  function triggerAlgoViz() {
+  function triggerAlgoViz(mode = 'connect') {
+    const cfg = ALGO_MODES[mode] || ALGO_MODES.connect;
     const overlayDiv = document.getElementById('algo-overlay');
     if (overlayDiv) overlayDiv.style.opacity = '1';
     if (algoSketch) algoSketch.remove();
@@ -2967,30 +3893,53 @@
         const frame = document.querySelector('.phone-frame');
         const fr = frame.getBoundingClientRect();
         const pL = fr.left, pR = fr.right, pT = fr.top, pB = fr.bottom;
+        const pW = pR - pL;
         const pH = pB - pT;
+        const pCX = pL + pW / 2;
+        const pCY = pT + pH / 2;
 
-        const srcY = [pT + pH * 0.25, pT + pH * 0.5, pT + pH * 0.75];
         const lx   = pL - p.width * 0.26;
         const rx   = pR + p.width * 0.26;
 
-        anchors = [
-          { x: lx, y: srcY[0], side: 'L', label: ANCHOR_LABELS[0] },
-          { x: lx, y: srcY[1], side: 'L', label: ANCHOR_LABELS[1] },
-          { x: lx, y: srcY[2], side: 'L', label: ANCHOR_LABELS[2] },
-          { x: rx, y: srcY[0], side: 'R', label: ANCHOR_LABELS[3] },
-          { x: rx, y: srcY[1], side: 'R', label: ANCHOR_LABELS[4] },
-          { x: rx, y: srcY[2], side: 'R', label: ANCHOR_LABELS[5] },
-        ];
+        anchors = [];
+        if (cfg.points) {
+          cfg.points.forEach((item) => {
+            const baseX = item.side === 'L' ? lx : rx;
+            const x = baseX + item.xOffset;
+            const y = pT + pH * item.y;
+            anchors.push({
+              x: Math.max(68, Math.min(p.width - 68, x)),
+              y: Math.max(58, Math.min(p.height - 58, y)),
+              side: item.side,
+              label: item.label,
+              flow: 'out'
+            });
+          });
+        } else {
+          const leftY = cfg.leftY || (cfg.left.length === 1 ? [0.5] : cfg.y);
+          const rightY = cfg.rightY || cfg.y;
+          cfg.left.forEach((label, i) => {
+            anchors.push({ x: lx, y: pT + pH * leftY[i], side: 'L', label, flow: cfg.allOut ? 'out' : 'in' });
+          });
+          cfg.right.forEach((label, i) => {
+            anchors.push({ x: rx, y: pT + pH * rightY[i], side: 'R', label, flow: (cfg.allOut || cfg.rightOut) ? 'out' : 'in' });
+          });
+        }
 
         anchors.forEach((anc, ai) => {
           const rand = srand(ai * 77771 + 13);
-          const isL  = anc.side === 'L';
-
-          for (let k = 0; k < 200; k++) {
-            const sx = anc.x + (rand() - 0.5) * 18;
-            const sy = anc.y + (rand() - 0.5) * 14;
-            const ty = pT + rand() * pH;
-            const tx = isL ? pL - rand() * 4 : pR + rand() * 4;
+          for (let k = 0; k < cfg.count; k++) {
+            const isOut = anc.flow === 'out';
+            const phoneY = cfg.points ? pT + pH * (0.08 + rand() * 0.84) : pT + rand() * pH;
+            const phoneX = cfg.points
+              ? (anc.side === 'L' ? pL - rand() * 8 : pR + rand() * 8)
+              : (anc.side === 'L' ? pL - rand() * 4 : pR + rand() * 4);
+            const anchorX = anc.x + (rand() - 0.5) * 18;
+            const anchorY = anc.y + (rand() - 0.5) * 14;
+            const sx = isOut ? phoneX : anchorX;
+            const sy = isOut ? phoneY : anchorY;
+            const tx = isOut ? anchorX : phoneX;
+            const ty = isOut ? anchorY : phoneY;
             const dx = tx - sx;
 
             const c1x = sx + dx * 0.55;
@@ -3002,7 +3951,7 @@
               sx, sy, c1x, c1y, c2x, c2y, tx, ty,
               alpha:  3 + rand() * 6,
               weight: 0.3 + rand() * 0.6,
-              delay:  ai * 200 + rand() * 200,
+              delay:  ai * 160 + rand() * 180 + (anc.side === 'R' ? (cfg.rightDelay || 0) : 0),
               dur:    4000 + rand() * 2000,
               drawn:  0,
             });
@@ -3032,15 +3981,15 @@
             const py1 = v*v*v*st.sy + 3*v*v*u*st.c1y + 3*v*u*u*st.c2y + u*u*u*st.ty;
 
             // outer glow
-            pg.stroke(224, 77, 15, st.alpha * 0.25);
+            pg.stroke(cfg.color[0], cfg.color[1], cfg.color[2], st.alpha * 0.25);
             pg.strokeWeight(st.weight * 3.5);
             pg.line(px0, py0, px1, py1);
             // mid glow
-            pg.stroke(224, 77, 15, st.alpha * 0.55);
+            pg.stroke(cfg.color[0], cfg.color[1], cfg.color[2], st.alpha * 0.55);
             pg.strokeWeight(st.weight * 1.2);
             pg.line(px0, py0, px1, py1);
             // core
-            pg.stroke(240, 185, 130, st.alpha * 1.4);
+            pg.stroke(cfg.core[0], cfg.core[1], cfg.core[2], st.alpha * 1.4);
             pg.strokeWeight(st.weight * 0.4);
             pg.line(px0, py0, px1, py1);
 
@@ -3053,16 +4002,17 @@
         p.image(pg, 0, 0);
 
         anchors.forEach((anc, ai) => {
-          const appear = Math.max(0, Math.min(1, (elapsed - ai * 200 - 300) / 500));
+          const anchorDelay = ai * 200 + (anc.side === 'R' ? (cfg.rightDelay || 0) : 0);
+          const appear = Math.max(0, Math.min(1, (elapsed - anchorDelay - 300) / 500));
           if (appear <= 0) return;
           p.noStroke();
-          p.fill(224, 77, 15, 200 * appear);
+          p.fill(cfg.color[0], cfg.color[1], cfg.color[2], 200 * appear);
           p.circle(anc.x, anc.y, 6);
-          p.fill(224, 77, 15, 35 * appear);
+          p.fill(cfg.color[0], cfg.color[1], cfg.color[2], 35 * appear);
           p.circle(anc.x, anc.y, 22);
           p.textFont('JetBrains Mono, monospace');
-          p.textSize(11);
-          p.fill(224, 77, 15, 190 * appear);
+          p.textSize(cfg.major?.includes(anc.label) ? 15 : 11);
+          p.fill(cfg.color[0], cfg.color[1], cfg.color[2], 190 * appear);
           if (anc.side === 'L') { p.textAlign(p.RIGHT, p.CENTER); p.text(anc.label, anc.x - 14, anc.y); }
           else                   { p.textAlign(p.LEFT,  p.CENTER); p.text(anc.label, anc.x + 14, anc.y); }
         });
