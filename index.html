@@ -10,24 +10,30 @@
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
-    --linko-orange: #f04a17;
-    --linko-blue: #001b5e;
+    --linko-orange: #ed4b00;
+    --linko-orange-dark: #c83d00;
+    --linko-blue: #0049ff;
+    --linko-navy: #000b1f;
+    --linko-ink: #000b1f;
+    --linko-sky: linear-gradient(155deg, #0049ff 0%, #78a7ff 43%, #eef7ff 100%);
+    --linko-orange-grad: linear-gradient(160deg, #ed4b00 0%, #ff7a24 58%, #ffb65c 100%);
   }
 
   body {
-    background: radial-gradient(ellipse at 40% 30%, #2a2a2a 0%, #111 50%, #080808 100%);
+    background: #000;
     min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
     font-family: 'DM Sans', sans-serif;
+    overflow: hidden;
   }
   .phone-wrapper {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 20px;
-    transform: scale(0.92);
+    gap: 14px;
+    transform: scale(1.04);
     transform-origin: center center;
     position: relative;
     z-index: 10;
@@ -41,6 +47,42 @@
     color: rgba(216, 91, 7, 0.58);
     text-align: center;
     transition: opacity 0.4s ease;
+  }
+  .split-sequence-labels {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 860px;
+    transform: translateX(-50%);
+    display: none;
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+    pointer-events: none;
+    z-index: 30;
+  }
+  .split-sequence-labels span {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 18px;
+    font-weight: 900;
+    letter-spacing: 2.8px;
+    text-transform: uppercase;
+    color: #fff;
+    text-align: center;
+    text-shadow: 0 10px 28px rgba(0,11,31,0.18);
+  }
+  .split-sequence-labels span:first-child {
+    position: relative;
+    top: 0;
+  }
+  .phone-wrapper.branch-labels-on > .sequence-label {
+    opacity: 1;
+  }
+  .phone-wrapper.branch-labels-on > .split-sequence-labels {
+    display: none;
+  }
+  @keyframes splitLabelIn {
+    from { opacity: 0; transform: translateX(-50%) translateY(8px); }
+    to { opacity: 1; transform: translateX(-50%) translateY(0); }
   }
   .phone-frame {
     position: relative;
@@ -68,6 +110,455 @@
     transform: none;
     transform-style: preserve-3d;
     filter: drop-shadow(0 34px 42px rgba(0,0,0,0.38));
+    transition: transform 0.9s cubic-bezier(0.22,1,0.36,1), opacity 0.6s ease;
+  }
+  .phone-wrapper.worker-mode .phone-frame:not(.worker-phone-frame) {
+    transform: none;
+  }
+  .worker-phone-frame {
+    position: absolute;
+    top: 44px;
+    left: 50%;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(-50%) translateX(220px) scale(0.985);
+    z-index: 9;
+  }
+  .phone-wrapper.worker-mode .worker-phone-frame {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(-50%) translateX(220px) scale(0.985);
+  }
+  .worker-phone {
+    background: linear-gradient(160deg, #ff4900 0%, #ff7c00 55%, #ffb347 100%) !important;
+  }
+  .worker-phone::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 40px;
+    background:
+      radial-gradient(circle at 26% 22%, rgba(255,255,255,0.28), transparent 24%),
+      radial-gradient(circle at 70% 78%, rgba(255,255,255,0.22), transparent 30%),
+      rgba(243,243,235,0.24);
+    backdrop-filter: blur(7px);
+    -webkit-backdrop-filter: blur(7px);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .worker-screen {
+    position: absolute;
+    inset: 0;
+    padding: 0 10px 18px;
+    color: #001b5e;
+    overflow: hidden;
+    z-index: 1;
+  }
+  .worker-head {
+    position: relative;
+    color: #001b5e;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 62px 22px 8px;
+    z-index: 6;
+  }
+  .worker-profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .worker-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    display: grid;
+    place-items: center;
+    font-size: 15px;
+    font-weight: 900;
+    color: #fff;
+    box-shadow: 0 10px 24px rgba(0,27,94,0.16);
+  }
+  .worker-profile strong {
+    display: block;
+    color: rgba(0,27,94,0.66);
+    font-size: 12px;
+    line-height: 1;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    font-weight: 900;
+    margin-bottom: 6px;
+  }
+  .worker-profile b {
+    display: block;
+    color: #001b5e;
+    font-size: 18px;
+    line-height: 1.05;
+  }
+  .worker-profile span {
+    display: block;
+    color: rgba(0,27,94,0.58);
+    font-size: 10.8px;
+    font-weight: 700;
+    margin-top: 5px;
+    max-width: 230px;
+  }
+  .worker-bell {
+    display: none;
+  }
+  .worker-branch-pill {
+    border-radius: 999px;
+    background: rgba(255,255,255,0.24);
+    border: 1px solid rgba(255,255,255,0.35);
+    color: rgba(0,27,94,0.62);
+    font-size: 11px;
+    font-weight: 900;
+    padding: 8px 10px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+  .branch-title {
+    color: rgba(0,27,94,0.66);
+    font-size: 16px;
+    font-weight: 1000;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+  }
+  .branch-subtitle {
+    color: rgba(0,27,94,0.5);
+    font-size: 11px;
+    font-weight: 800;
+  }
+  .stack-title-group {
+    display: grid;
+    gap: 4px;
+    text-align: right;
+  }
+  .stack-title-group .stack-count {
+    display: none;
+  }
+  .worker-panel {
+    position: absolute;
+    left: 4px;
+    right: 4px;
+    top: 112px;
+    bottom: 18px;
+    border-radius: 0;
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+    padding: 0;
+    overflow: visible;
+    z-index: 2;
+  }
+  .worker-stack-blob {
+    position: absolute;
+    left: 167px;
+    top: 430px;
+    transform: translate(-50%, -50%);
+    transform-origin: center center;
+    width: 50px;
+    height: 70px;
+    border-radius: 22px;
+    background: linear-gradient(180deg, #001b5e 0%, #002fa0 60%, #001040 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 14px 30px rgba(0,27,94,0.28);
+    animation: stackBlobPulse 4s ease-in-out infinite;
+    transition: left 0.48s cubic-bezier(0.22,1,0.36,1), opacity 0.36s ease;
+    z-index: 4;
+  }
+  .worker-stack-blob .blob-mark {
+    width: 22px;
+    height: 22px;
+  }
+  .worker-screen:has(.worker-cards.is-expanded) .worker-stack-blob {
+    left: -42px;
+    opacity: 0;
+  }
+  .worker-section-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 0 10px 8px;
+  }
+  .worker-helper {
+    color: rgba(0,27,94,0.62);
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.36;
+    margin: 0 10px 12px;
+  }
+  .worker-section-top h3 {
+    font-size: 13px;
+    line-height: 1.05;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    color: rgba(0,27,94,0.72);
+  }
+  .worker-section-top span {
+    color: var(--linko-orange);
+    font-size: 12px;
+    font-weight: 900;
+  }
+  .worker-cards {
+    position: relative;
+    height: 704px;
+    margin: 10px 0 0;
+  }
+  .worker-card {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 10px;
+    border: none;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.58);
+    border: 1px solid rgba(255,255,255,0.54);
+    backdrop-filter: blur(18px) saturate(1.22);
+    -webkit-backdrop-filter: blur(18px) saturate(1.22);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.78),
+      inset 0 -18px 34px rgba(255,255,255,0.16),
+      0 16px 38px rgba(0,27,94,0.14);
+    padding: 14px;
+    text-align: left;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    color: #001b5e;
+    overflow: hidden;
+    transition: transform 0.34s cubic-bezier(0.22,1,0.36,1), opacity 0.34s ease;
+  }
+  .worker-card:nth-child(1) {
+    left: auto;
+    top: auto;
+    width: auto;
+    height: auto;
+  }
+  .worker-card:nth-child(2) {
+    left: auto;
+    top: auto;
+    width: auto;
+    height: auto;
+  }
+  .worker-card:nth-child(3) {
+    left: auto;
+    top: auto;
+    width: auto;
+    height: auto;
+  }
+  .worker-cards.stack-cards .worker-card {
+    gap: 0;
+  }
+  .worker-cards.stack-cards .preference-card,
+  .worker-cards.stack-cards .rec-card-shell {
+    display: block;
+  }
+  .worker-cards.stack-cards .preference-card {
+    left: 0;
+    top: 0;
+    width: 132px;
+    height: 324px;
+  }
+  .worker-cards.stack-cards .rec-card-shell[data-slot="0"] {
+    left: 136px;
+    top: 0;
+    width: 246px;
+    height: 248px;
+  }
+  .worker-cards.stack-cards .rec-card-shell[data-slot="1"] {
+    left: 0;
+    top: 328px;
+    width: 190px;
+    height: 356px;
+  }
+  .worker-cards.stack-cards .rec-card-shell[data-slot="2"] {
+    left: 194px;
+    top: 252px;
+    width: 188px;
+    height: 432px;
+  }
+  .worker-cards.stack-cards .rec-card-shell.expanded {
+    display: flex;
+  }
+  .worker-cards.stack-cards .rec-card-shell:not(.expanded) .worker-card-avatar {
+    display: none;
+  }
+  .worker-cards.stack-cards .rec-card-shell:not(.expanded):hover {
+    transform: translateY(-3px);
+  }
+  .worker-cards.stack-cards .preference-card:hover {
+    transform: none;
+  }
+  .worker-cards.stack-cards .preference-card.expanded {
+    display: grid;
+    align-content: start;
+  }
+  .worker-support-panel {
+    display: none;
+    margin-top: 12px;
+    gap: 10px;
+  }
+  .worker-cards.stack-cards .preference-card.expanded .worker-support-panel {
+    display: grid;
+  }
+  .worker-support-group {
+    display: grid;
+    gap: 6px;
+  }
+  .worker-support-group small {
+    color: rgba(255,255,255,0.68);
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+  }
+  .worker-card.preference-card .support-option {
+    border-radius: 999px;
+    padding: 6px 9px;
+    border: 1px solid rgba(255,255,255,0.32);
+    background: rgba(255,255,255,0.13);
+    color: #fff;
+    box-shadow: none;
+    font-size: 10px;
+    font-weight: 900;
+  }
+  .worker-card.preference-card .support-option.on {
+    background: #fff;
+    color: var(--linko-orange);
+  }
+  .worker-support-done {
+    justify-self: start;
+    border: 1px solid rgba(255,255,255,0.38);
+    border-radius: 999px;
+    background: rgba(255,255,255,0.14);
+    color: #fff;
+    padding: 7px 12px;
+    font: 900 10px 'DM Sans', sans-serif;
+  }
+  .worker-card-avatar {
+    width: 58px;
+    height: 58px;
+    border-radius: 21px;
+    background: linear-gradient(135deg, rgba(0,27,94,0.96), rgba(0,47,160,0.92));
+    display: grid;
+    place-items: center;
+    font-size: 22px;
+    font-weight: 900;
+    color: var(--linko-orange);
+    box-shadow: 0 14px 28px rgba(0,27,94,0.2);
+  }
+  .worker-card strong {
+    display: block;
+    font-size: 17px;
+    line-height: 1.1;
+  }
+  .worker-card em {
+    display: block;
+    color: var(--linko-orange);
+    font-style: normal;
+    font-size: 12px;
+    font-weight: 900;
+    line-height: 1.18;
+    margin: 6px 0 4px;
+  }
+  .worker-card small {
+    color: rgba(0,27,94,0.62);
+    font-size: 12px;
+    font-weight: 800;
+    line-height: 1.25;
+  }
+  .worker-card i { display: none; }
+  .worker-cards.stack-cards .summary-meta i,
+  .worker-cards.stack-cards .card-actions i {
+    display: inline-block;
+  }
+  .worker-insights {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin: 18px 0;
+  }
+  .worker-panel .worker-insights,
+  .worker-panel .worker-followups {
+    display: none;
+  }
+  .worker-followup-card {
+    display: none;
+  }
+  .worker-stat {
+    border-radius: 18px;
+    background: rgba(0,27,94,0.055);
+    min-height: 76px;
+    padding: 12px 10px;
+  }
+  .worker-stat strong {
+    display: block;
+    font-size: 28px;
+    line-height: 1;
+  }
+  .worker-stat span {
+    display: block;
+    font-size: 10.5px;
+    color: rgba(0,27,94,0.64);
+    font-weight: 800;
+    line-height: 1.22;
+    margin-top: 7px;
+  }
+  .worker-detail {
+    position: absolute;
+    inset: 0 12px 0;
+    border-radius: 22px;
+    background: rgba(255,255,255,0.84);
+    border: 1px solid rgba(255,255,255,0.68);
+    backdrop-filter: blur(20px) saturate(1.18);
+    -webkit-backdrop-filter: blur(20px) saturate(1.18);
+    box-shadow: 0 24px 48px rgba(0,27,94,0.2);
+    padding: 24px 20px;
+    display: none;
+    flex-direction: column;
+    z-index: 4;
+  }
+  .worker-detail.open {
+    display: flex;
+    animation: screenFadeIn 0.34s ease both;
+  }
+  .worker-detail h3 {
+    font-size: 25px;
+    line-height: 1.02;
+    margin: 12px 0 10px;
+  }
+  .worker-detail p {
+    color: #333846;
+    font-size: 13px;
+    line-height: 1.45;
+  }
+  .worker-detail-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1.2fr;
+    gap: 8px;
+    margin-top: auto;
+  }
+  .worker-detail-actions button {
+    min-height: 44px;
+    border-radius: 999px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 900;
+    cursor: pointer;
+  }
+  .worker-detail-actions .worker-ghost {
+    border: 1.5px solid rgba(0,27,94,0.2);
+    background: transparent;
+    color: #001b5e;
+  }
+  .worker-detail-actions .worker-join {
+    border: none;
+    background: #001b5e;
+    color: #f04a17;
   }
 
   /* 볼륨 버튼 */
@@ -519,6 +1010,9 @@
   #oneButtonPreferences .segment-control {
     width: 100%;
   }
+  #oneButtonPreferences .segment-control:has(button:nth-child(2):last-child) {
+    grid-template-columns: repeat(2, 1fr);
+  }
   #oneButtonPreferences .segment-control button {
     min-height: 31px;
     font-size: 12px;
@@ -738,7 +1232,25 @@
     text-align: left;
     cursor: pointer;
     overflow: hidden;
-    transition: all 0.42s cubic-bezier(0.4,0,0.2,1);
+    transition:
+      left 0.78s cubic-bezier(0.16,1,0.3,1),
+      top 0.78s cubic-bezier(0.16,1,0.3,1),
+      width 0.78s cubic-bezier(0.16,1,0.3,1),
+      height 0.78s cubic-bezier(0.16,1,0.3,1),
+      padding 0.78s cubic-bezier(0.16,1,0.3,1),
+      border-radius 0.78s cubic-bezier(0.16,1,0.3,1),
+      box-shadow 0.78s cubic-bezier(0.16,1,0.3,1),
+      opacity 0.46s ease,
+      transform 0.78s cubic-bezier(0.16,1,0.3,1),
+      filter 0.46s ease;
+    will-change: left, top, width, height, transform, opacity;
+  }
+  .stack-card.is-morphing {
+    transition:
+      opacity 0.46s ease,
+      filter 0.46s ease,
+      box-shadow 0.78s cubic-bezier(0.16,1,0.3,1) !important;
+    transform-origin: top left !important;
   }
   .preference-card {
     left: 0;
@@ -1160,7 +1672,7 @@
   }
   .rec-card {
     min-width: 280px;
-    background: #fff;
+    background: #050505 !important;
     border-radius: 24px;
     padding: 20px;
     scroll-snap-align: start;
@@ -1333,7 +1845,7 @@
     font-size: 11px;
     font-weight: 700;
     color: rgba(0,27,94,0.54);
-    text-transform: uppercase;
+    text-transform: none;
     letter-spacing: 0.5px;
     margin-bottom: 10px;
   }
@@ -1660,7 +2172,7 @@
   .booking-kicker {
     color: rgba(0,27,94,0.58);
     font-size: 11px;
-    text-transform: uppercase;
+    text-transform: none;
     letter-spacing: 0.5px;
     font-weight: 800;
     margin-bottom: 8px;
@@ -1809,6 +2321,23 @@
     padding: 13px 12px;
     font-size: 13px;
     min-height: 46px;
+  }
+  .feedback-scale button,
+  .feedback-chips button,
+  .segment-control button,
+  .support-option {
+    transition:
+      background-color 0.16s ease,
+      border-color 0.16s ease,
+      color 0.16s ease,
+      box-shadow 0.18s ease,
+      transform 0.14s ease;
+  }
+  .feedback-scale button:active,
+  .feedback-chips button:active,
+  .segment-control button:active,
+  .support-option:active {
+    transform: scale(0.97);
   }
   .swipe-header {
     background: #001b5e;
@@ -2293,12 +2822,12 @@
     border-radius: 80px;
     background:
       radial-gradient(circle at 32% 18%, rgba(255,255,255,0.34), transparent 24%),
-      linear-gradient(160deg, #ff8a35 0%, var(--linko-orange) 58%, #c93508 100%);
+      linear-gradient(160deg, #4d8aff 0%, #0049ff 58%, #002db3 100%);
     color: var(--linko-blue);
     font-family: 'DM Sans', sans-serif;
     font-size: 18px;
     font-weight: 900;
-    box-shadow: 0 22px 54px rgba(240,74,23,0.3);
+    box-shadow: 0 22px 54px rgba(0,73,255,0.3);
     filter: drop-shadow(0 18px 26px rgba(0,0,0,0.22));
     cursor: pointer;
     animation: btnPulse 4s ease-in-out infinite, publishOrbIn 0.72s cubic-bezier(0.22,1,0.36,1) both;
@@ -2394,6 +2923,2540 @@
     68% { opacity: 1; transform: scale(1.08); }
     100% { opacity: 1; transform: scale(1); }
   }
+
+  /* ══════════════════════════════
+     BRAND REFRESH — 2026.06
+  ══════════════════════════════ */
+  .sequence-label {
+    color: #fff;
+    font-size: 18px;
+    font-weight: 900;
+    letter-spacing: 2.8px;
+    text-shadow: 0 10px 28px rgba(0,11,31,0.18);
+  }
+  .phone,
+  .stack-card,
+  .status-card,
+  .create-card,
+  .host-intro-card,
+  .activity-detail-card,
+  .location-detail-card,
+  .booking-card,
+  .booking-map-card,
+  .booking-actions-card {
+    color: var(--linko-ink);
+  }
+  #s2,
+  #s4-overlay,
+  .worker-phone,
+  #s5,
+  #s6,
+  #s8,
+  #s9 {
+    background: var(--linko-sky) !important;
+  }
+  #s4-overlay::before,
+  .worker-phone::before,
+  #s5::before,
+  #s6::before,
+  #s8::before,
+  #s9::before {
+    background:
+      radial-gradient(circle at 36% 42%, rgba(255,255,255,0.58), rgba(255,255,255,0.18) 42%, transparent 68%),
+      rgba(238,247,255,0.24);
+  }
+  .big-btn {
+    background:
+      radial-gradient(circle at 32% 18%, rgba(255,255,255,0.34), transparent 24%),
+      var(--linko-orange-grad) !important;
+    box-shadow: 0 18px 46px rgba(0,73,255,0.22), 0 18px 34px rgba(237,75,0,0.22);
+  }
+  .big-btn-label,
+  .publish-orb {
+    color: #fff !important;
+  }
+  .big-btn .blob-mark,
+  .publish-orb img {
+    filter: brightness(0) invert(1);
+  }
+  .segment-control {
+    background: rgba(0,73,255,0.2);
+    border-color: rgba(255,255,255,0.35);
+  }
+  .segment-control button {
+    color: rgba(255,255,255,0.94);
+  }
+  .segment-control button.on,
+  #oneButtonPreferences .segment-control button.on {
+    background: #ff4900;
+    color: #fff;
+    box-shadow: 0 8px 18px rgba(255,73,0,0.24);
+  }
+  .stack-label,
+  .detail-section-label,
+  .create-label,
+  .booking-status,
+  .unlock-badge,
+  .rec-pill,
+  .detail-pill {
+    background: var(--linko-blue) !important;
+    color: #fff !important;
+    border-radius: 12px;
+    padding: 5px 10px;
+    width: fit-content;
+    letter-spacing: 0.4px;
+  }
+  .detail-section-label,
+  .create-label {
+    display: inline-flex;
+    align-items: center;
+    margin-bottom: 12px;
+    font-size: 11px;
+    font-weight: 900;
+  }
+  .branch-title,
+  .page-tab {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 31px;
+    padding: 0 16px 0 20px;
+    background: var(--linko-blue);
+    color: #fff !important;
+    font-size: 15px;
+    font-weight: 1000;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    border-radius: 0 12px 0 0;
+    box-shadow: 0 12px 24px rgba(0,73,255,0.18);
+  }
+  .detail-page > .page-tab,
+  .booking-page > .page-tab {
+    align-self: flex-end;
+    margin: -2px 8px -2px 0;
+  }
+  .branch-title::before,
+  .page-tab::before {
+    content: "";
+    position: absolute;
+    left: -15px;
+    top: 0;
+    width: 16px;
+    height: 100%;
+    background: var(--linko-blue);
+    clip-path: polygon(100% 0, 100% 100%, 0 100%);
+  }
+  .stack-title-group {
+    gap: 0;
+    text-align: right;
+  }
+  .stack-back,
+  .icon-btn {
+    background: rgba(255,255,255,0.22) !important;
+    color: #fff !important;
+    border: 1px solid rgba(255,255,255,0.35) !important;
+  }
+  .stack-card h3,
+  .rec-title,
+  .host-name,
+  .detail-title-text,
+  .location-title,
+  .booking-title,
+  .booking-info strong,
+  .feedback-question,
+  .flow-title,
+  .status-copy strong,
+  .credit-total,
+  .create-title,
+  .create-field {
+    color: var(--linko-ink) !important;
+  }
+  .stack-summary,
+  .stack-reason,
+  .detail-summary-text,
+  .host-intro-text,
+  .booking-sub,
+  .booking-note,
+  .status-copy span,
+  .create-sub,
+  .create-hint {
+    color: rgba(0,11,31,0.74) !important;
+  }
+  .summary-meta span,
+  .detail-meta-row,
+  .host-trust,
+  .map-legend span,
+  .preference-overview div,
+  .preference-tags span,
+  .location-sub,
+  .booking-info span,
+  .worker-card small {
+    color: var(--linko-ink) !important;
+  }
+  .summary-meta i,
+  .detail-meta-row i,
+  .host-trust i,
+  .comfort-note i,
+  .map-legend i,
+  .booking-info i,
+  .booking-note i,
+  .status-icon,
+  .worker-card em {
+    color: var(--linko-orange) !important;
+  }
+  .btn-primary,
+  .card-btn-join,
+  .create-button,
+  #createActivityBtn,
+  #submitFeedbackBtn,
+  #completeActivityBtn {
+    background: var(--linko-blue) !important;
+    color: #fff !important;
+    border: none !important;
+  }
+  .btn-ghost,
+  .card-btn-sm,
+  .create-secondary,
+  .feedback-scale button,
+  .feedback-chips button,
+  .pref-chip,
+  .create-chip {
+    background: var(--linko-orange) !important;
+    color: #fff !important;
+    border-color: var(--linko-orange) !important;
+  }
+  .feedback-scale button.on,
+  .feedback-chips button.on,
+  .pref-chip.on,
+  .create-chip.on {
+    background: var(--linko-blue) !important;
+    border-color: var(--linko-blue) !important;
+    color: #fff !important;
+  }
+  .stack-blob,
+  .worker-stack-blob,
+  .host-avatar-large,
+  .booking-check,
+  .worker-card-avatar,
+  .avatar {
+    background: linear-gradient(180deg, #0049ff 0%, #0036bf 100%) !important;
+    color: #fff !important;
+  }
+  .preference-card,
+  .worker-cards.stack-cards .preference-card,
+  .unlock-card {
+    background: var(--linko-blue) !important;
+    color: #fff !important;
+  }
+  .preference-card *,
+  .worker-cards.stack-cards .preference-card *,
+  .unlock-card * {
+    color: #fff !important;
+  }
+  #s10 {
+    background: var(--linko-orange-grad) !important;
+  }
+  #s10 .create-page {
+    color: #fff;
+  }
+  #s10 .create-card {
+    background: rgba(255,255,255,0.22);
+    border-color: rgba(255,255,255,0.32);
+  }
+  #s10 .create-title,
+  #s10 .create-field {
+    color: #fff !important;
+  }
+  #s10 .create-sub,
+  #s10 .create-hint {
+    color: rgba(255,255,255,0.82) !important;
+  }
+  #s10.publishing {
+    background:
+      radial-gradient(circle at 34% 24%, rgba(255,255,255,0.26), transparent 28%),
+      var(--linko-orange-grad) !important;
+  }
+  #s10.published {
+    background: #fff !important;
+  }
+  #s10.published .publish-finale {
+    color: var(--linko-orange) !important;
+  }
+  .publish-lines line {
+    stroke: rgba(200,61,0,0.56);
+  }
+  .publish-orb {
+    background:
+      radial-gradient(circle at 32% 18%, rgba(255,255,255,0.34), transparent 24%),
+      var(--linko-orange-grad) !important;
+  }
+  .publish-finale img {
+    filter: none !important;
+  }
+  .credit-slot.filled {
+    border-color: rgba(237,75,0,0.28);
+  }
+  .credit-orb,
+  .map-distance-badge,
+  .dot.on {
+    background: var(--linko-orange) !important;
+  }
+  .belonging-video {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+  }
+  #s6 .booking-video-card .join-map-box {
+    background: #000b1f;
+  }
+  #s6 .booking-map-card:not(.booking-video-card) .join-map-box {
+    height: 188px;
+    background: #e6e0d2;
+  }
+  .worker-card-avatar {
+    overflow: hidden;
+  }
+  .worker-card-avatar img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+  }
+  .worker-cards.stack-cards .rec-card-shell:not(.expanded) .worker-card-avatar {
+    display: block;
+    width: 38px;
+    height: 38px;
+    border-radius: 15px;
+    margin-bottom: 10px;
+  }
+  .worker-card-photo {
+    margin: auto auto 18px;
+  }
+  .journey-chart {
+    width: 100%;
+    height: 150px;
+    margin-top: 12px;
+    display: block;
+  }
+
+  /* ══════════════════════════════
+     REFINEMENT PASS — shared layout rules
+  ══════════════════════════════ */
+  .branch-title,
+  .page-tab,
+  #s8 .flow-title,
+  #s9 .flow-title {
+    background: var(--linko-navy) !important;
+    color: #fff !important;
+    min-height: 31px;
+    height: 31px;
+    padding: 0 16px 0 20px;
+    border-radius: 0 12px 0 0;
+    font-size: 15px;
+    font-weight: 1000;
+    line-height: 31px;
+    width: fit-content;
+    box-shadow: 0 12px 24px rgba(0,11,31,0.18);
+  }
+  #s8 .flow-title,
+  #s9 .flow-title {
+    margin-left: auto;
+    position: relative;
+    text-transform: none;
+  }
+  #s8 .flow-title::before,
+  #s9 .flow-title::before {
+    content: "";
+    position: absolute;
+    left: -15px;
+    top: 0;
+    width: 16px;
+    height: 100%;
+    background: var(--linko-navy);
+    clip-path: polygon(100% 0, 100% 100%, 0 100%);
+  }
+  .stack-top,
+  .worker-head,
+  .detail-nav,
+  .booking-top,
+  .create-top,
+  .flow-hero {
+    min-height: 48px;
+  }
+  .stack-top,
+  .worker-head {
+    padding: 58px 22px 4px !important;
+  }
+  .detail-page,
+  .booking-page,
+  .create-page {
+    padding-top: 58px !important;
+    gap: 0 !important;
+  }
+  .detail-nav,
+  .booking-top,
+  .create-top {
+    padding: 0 2px 6px !important;
+    margin-bottom: 0 !important;
+  }
+  .detail-page > .page-tab,
+  .booking-page > .page-tab {
+    align-self: flex-end;
+    margin: 4px 8px -1px 0 !important;
+    z-index: 3;
+  }
+  #s8 .flow-hero,
+  #s9 .flow-hero {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 58px 24px 0 !important;
+    height: 98px;
+  }
+  #s8 .flow-body,
+  #s9 .flow-body {
+    height: calc(100% - 98px) !important;
+    padding-top: 0 !important;
+  }
+  .host-intro-card,
+  .booking-card,
+  .status-card:first-child,
+  .create-card:first-of-type {
+    border-top-right-radius: 0 !important;
+  }
+  .btn-primary,
+  .card-btn-join,
+  #submitFeedbackBtn,
+  #completeActivityBtn,
+  #createActivityBtn {
+    background: var(--linko-orange) !important;
+    color: #fff !important;
+    border: none !important;
+    box-shadow: 0 12px 26px rgba(237,75,0,0.18) !important;
+  }
+  .btn-ghost,
+  .card-btn-sm,
+  .feedback-actions .btn-ghost,
+  .credit-actions .btn-ghost,
+  .booking-actions .btn-ghost,
+  .action-group .btn-ghost,
+  .create-secondary {
+    background: rgba(255,255,255,0.16) !important;
+    color: var(--linko-ink) !important;
+    border: 1.5px solid rgba(0,11,31,0.18) !important;
+    box-shadow: none !important;
+  }
+  #s5 .action-group .btn-ghost,
+  #s6 .booking-actions .btn-ghost,
+  #s8 .feedback-actions .btn-ghost,
+  #s9 .credit-actions .btn-ghost {
+    color: var(--linko-ink) !important;
+  }
+  .feedback-scale button,
+  .feedback-chips button {
+    background: rgba(255,255,255,0.18) !important;
+    color: var(--linko-ink) !important;
+    border: 1px solid rgba(0,11,31,0.14) !important;
+  }
+  .feedback-scale button.on,
+  .feedback-chips button.on,
+  .pref-chip.on,
+  .create-chip.on {
+    background: var(--linko-orange) !important;
+    border-color: var(--linko-orange) !important;
+    color: #fff !important;
+  }
+  #oneButtonPreferences .segment-control {
+    background: rgba(0,11,31,0.12) !important;
+    border-color: rgba(255,255,255,0.28) !important;
+  }
+  #oneButtonPreferences .segment-control button.on {
+    background: rgba(0,11,31,0.28) !important;
+    color: #fff !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.18), 0 8px 18px rgba(0,11,31,0.12) !important;
+  }
+  .stack-blob,
+  .worker-stack-blob {
+    background:
+      radial-gradient(circle at 32% 18%, rgba(255,255,255,0.34), transparent 24%),
+      var(--linko-orange-grad) !important;
+    box-shadow: 0 14px 30px rgba(237,75,0,0.26) !important;
+  }
+  .stack-blob .blob-mark,
+  .worker-stack-blob .blob-mark {
+    filter: brightness(0) invert(1) !important;
+  }
+  .preference-card,
+  .worker-cards.stack-cards .preference-card,
+  .unlock-card {
+    background: var(--linko-navy) !important;
+    color: #fff !important;
+  }
+  .preference-card *,
+  .worker-cards.stack-cards .preference-card *,
+  .unlock-card,
+  .unlock-card * {
+    color: #fff !important;
+  }
+  .booking-status {
+    display: none !important;
+  }
+  .booking-check {
+    background: var(--linko-orange) !important;
+    color: #fff !important;
+  }
+  .booking-video-card {
+    padding: 0;
+    overflow: hidden;
+    margin: 12px 0;
+  }
+  .booking-video-card .join-map-box {
+    height: 194px;
+    border-radius: 24px;
+  }
+  .progress-section-label {
+    display: inline-flex;
+    align-items: center;
+    background: var(--linko-blue);
+    color: #fff;
+    border-radius: 12px;
+    padding: 5px 10px;
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 0.4px;
+    margin-bottom: 12px;
+  }
+  #s10 .page-tab {
+    align-self: flex-end;
+    margin: 4px 8px -1px auto;
+    z-index: 3;
+  }
+  #s10 {
+    background:
+      radial-gradient(circle at 38% 46%, rgba(255,255,255,0.34) 0%, rgba(255,255,255,0.08) 42%, transparent 68%),
+      var(--linko-orange-grad) !important;
+  }
+  #s10::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(243,243,235,0.22);
+    backdrop-filter: blur(7px);
+    -webkit-backdrop-filter: blur(7px);
+    pointer-events: none;
+    z-index: 0;
+  }
+  #s10 .create-page,
+  #s10 .publish-stage {
+    position: relative;
+    z-index: 1;
+  }
+  #s10 .create-card {
+    background: rgba(255,255,255,0.58) !important;
+    border-color: rgba(255,255,255,0.54) !important;
+    color: var(--linko-ink) !important;
+  }
+  #s10 .create-label {
+    background: var(--linko-orange) !important;
+    color: #fff !important;
+  }
+  #s10 .create-title,
+  #s10 .create-field {
+    color: var(--linko-ink) !important;
+  }
+  #s10 .create-sub,
+  #s10 .create-hint {
+    color: rgba(0,11,31,0.72) !important;
+  }
+  #s10 .create-button {
+    background: var(--linko-blue) !important;
+    color: #fff !important;
+  }
+  #s10 .create-secondary {
+    background: rgba(255,255,255,0.16) !important;
+    color: var(--linko-ink) !important;
+    border-color: rgba(0,11,31,0.18) !important;
+  }
+  #s10.publishing .publish-orb {
+    background: linear-gradient(180deg, #001b5e 0%, #002fa0 60%, #001040 100%) !important;
+    color: #fff !important;
+    box-shadow: 0 22px 54px rgba(0,27,94,0.28) !important;
+  }
+  #s10.publishing .publish-orb::before {
+    background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.18), transparent 62%);
+  }
+
+  /* ══════════════════════════════
+     FINAL ALIGNMENT PASS — requested shared rules
+  ══════════════════════════════ */
+  .branch-title,
+  .page-tab,
+  #s8 .flow-title,
+  #s9 .flow-title {
+    background: var(--linko-navy) !important;
+    color: #fff !important;
+    height: 32px !important;
+    min-height: 32px !important;
+    line-height: 32px !important;
+    padding: 0 17px 0 20px !important;
+    border-radius: 0 12px 0 0 !important;
+    font-size: 15.5px !important;
+    font-weight: 1000 !important;
+    letter-spacing: 0.45px !important;
+    box-shadow: 0 12px 26px rgba(0,11,31,0.22) !important;
+  }
+  .branch-title::before,
+  .page-tab::before,
+  #s8 .flow-title::before,
+  #s9 .flow-title::before {
+    background: var(--linko-navy) !important;
+  }
+  .stack-top,
+  .worker-head {
+    min-height: 48px !important;
+    padding: 58px 22px 4px !important;
+  }
+  .detail-page,
+  .booking-page,
+  .create-page {
+    padding-top: 58px !important;
+  }
+  .detail-nav,
+  .booking-top,
+  .create-top {
+    min-height: 48px !important;
+    padding: 0 2px 6px !important;
+    margin: 0 !important;
+  }
+  .detail-page > .page-tab,
+  .booking-page > .page-tab,
+  #s10 .page-tab {
+    align-self: flex-end !important;
+    margin: 4px 8px -1px auto !important;
+  }
+  .host-intro-card,
+  .booking-card,
+  .status-card:first-child,
+  .create-card:first-of-type {
+    border-top-right-radius: 0 !important;
+  }
+
+  .btn-primary,
+  .card-btn-join,
+  #submitFeedbackBtn,
+  #completeActivityBtn,
+  #createActivityBtn {
+    background: var(--linko-orange) !important;
+    color: #fff !important;
+    border: none !important;
+    box-shadow: 0 13px 28px rgba(237,75,0,0.2) !important;
+  }
+  .btn-ghost,
+  .card-btn-sm,
+  .feedback-actions .btn-ghost,
+  .credit-actions .btn-ghost,
+  .booking-actions .btn-ghost,
+  .action-group .btn-ghost,
+  .create-secondary {
+    background: rgba(255,255,255,0.16) !important;
+    color: var(--linko-ink) !important;
+    border: 1.5px solid rgba(0,11,31,0.18) !important;
+    box-shadow: none !important;
+  }
+  .feedback-scale button,
+  .feedback-chips button {
+    background: rgba(255,255,255,0.18) !important;
+    color: var(--linko-ink) !important;
+    border: 1px solid rgba(0,11,31,0.14) !important;
+    box-shadow: none !important;
+  }
+  .feedback-scale button.on,
+  .feedback-chips button.on {
+    background: var(--linko-orange) !important;
+    border-color: var(--linko-orange) !important;
+    color: #fff !important;
+  }
+
+  #oneButtonPreferences .segment-control {
+    background: rgba(0,11,31,0.11) !important;
+    border-color: rgba(255,255,255,0.28) !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.14) !important;
+  }
+  #oneButtonPreferences .segment-control button {
+    color: rgba(255,255,255,0.9) !important;
+  }
+  #oneButtonPreferences .segment-control button.on {
+    background: rgba(0,11,31,0.26) !important;
+    color: #fff !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.18), 0 8px 18px rgba(0,11,31,0.12) !important;
+  }
+
+  .preference-card,
+  .worker-cards.stack-cards .preference-card,
+  .unlock-card {
+    background: var(--linko-navy) !important;
+    color: #fff !important;
+  }
+  .preference-card *,
+  .worker-cards.stack-cards .preference-card *,
+  .unlock-card,
+  .unlock-card * {
+    color: #fff !important;
+  }
+  .stack-blob,
+  .worker-stack-blob {
+    background:
+      radial-gradient(circle at 32% 18%, rgba(255,255,255,0.34), transparent 24%),
+      var(--linko-orange-grad) !important;
+    box-shadow: 0 14px 30px rgba(237,75,0,0.26) !important;
+  }
+  .stack-blob .blob-mark,
+  .worker-stack-blob .blob-mark {
+    filter: brightness(0) invert(1) !important;
+  }
+
+  .booking-status {
+    display: none !important;
+  }
+  .booking-check {
+    background: var(--linko-orange) !important;
+    color: #fff !important;
+  }
+  .booking-video-card {
+    padding: 0 !important;
+    overflow: hidden !important;
+    margin: 12px 0 !important;
+  }
+  .booking-video-card .join-map-box {
+    height: 194px !important;
+    border-radius: 24px !important;
+  }
+  .booking-video-card + .booking-map-card {
+    margin-top: 0 !important;
+  }
+  .progress-section-label {
+    background: var(--linko-blue) !important;
+    color: #fff !important;
+  }
+
+  #s10 {
+    background:
+      radial-gradient(circle at 38% 46%, rgba(255,255,255,0.34) 0%, rgba(255,255,255,0.08) 42%, transparent 68%),
+      var(--linko-orange-grad) !important;
+  }
+  #s10::before {
+    background: rgba(243,243,235,0.22) !important;
+  }
+  #s10 .create-label {
+    background: var(--linko-orange) !important;
+    color: #fff !important;
+  }
+  #s10 .create-card {
+    background: rgba(255,255,255,0.58) !important;
+    border-color: rgba(255,255,255,0.54) !important;
+    color: var(--linko-ink) !important;
+  }
+  #s10 .create-title,
+  #s10 .create-field,
+  #s10 .create-card strong {
+    color: var(--linko-ink) !important;
+  }
+  #s10 .create-sub,
+  #s10 .create-hint,
+  #s10 .create-card p {
+    color: rgba(0,11,31,0.72) !important;
+  }
+  #s10 .create-button {
+    background: var(--linko-blue) !important;
+    color: #fff !important;
+    border: none !important;
+  }
+  #s10 .create-secondary {
+    background: rgba(255,255,255,0.16) !important;
+    color: var(--linko-ink) !important;
+    border: 1.5px solid rgba(0,11,31,0.18) !important;
+  }
+  #s10.publishing .publish-orb {
+    background: linear-gradient(180deg, #001b5e 0%, #002fa0 60%, #001040 100%) !important;
+    color: #fff !important;
+  }
+  .publish-lines line {
+    stroke: rgba(0,73,255,0.54) !important;
+  }
+
+  /* ══════════════════════════════
+     REPAIR PASS — align with linko14 structure
+  ══════════════════════════════ */
+  :root {
+    --linko-sky: linear-gradient(180deg, #eef7ff 0%, #78a7ff 44%, #0049ff 100%);
+    --linko-orange-grad: linear-gradient(180deg, #ffb65c 0%, #ff7a24 45%, #ed4b00 100%);
+    --stack-gap: 4px;
+    --top-stack-start: 106px;
+  }
+  #s2,
+  #s4-overlay,
+  .worker-phone,
+  #s5,
+  #s6,
+  #s8,
+  #s9 {
+    background: var(--linko-sky) !important;
+  }
+  #s4-overlay::before,
+  .worker-phone::before,
+  #s5::before,
+  #s6::before,
+  #s8::before,
+  #s9::before {
+    background:
+      radial-gradient(circle at 42% 40%, rgba(255,255,255,0.42), rgba(255,255,255,0.12) 42%, transparent 68%),
+      rgba(243,243,235,0.18) !important;
+  }
+
+  #oneButtonPreferences .segment-control {
+    background: rgba(255,255,255,0.18) !important;
+    border-color: rgba(255,255,255,0.26) !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.2) !important;
+  }
+  #oneButtonPreferences .segment-control button {
+    color: rgba(255,255,255,0.94) !important;
+    text-shadow: 0 1px 8px rgba(0,27,94,0.18);
+  }
+  #oneButtonPreferences .segment-control button.on {
+    background: rgba(0,73,255,0.64) !important;
+    color: #fff !important;
+    box-shadow: 0 7px 18px rgba(0,27,94,0.16) !important;
+  }
+
+  .stack-top,
+  .worker-head,
+  .detail-nav,
+  .booking-top,
+  .create-top,
+  .flow-hero {
+    height: var(--top-stack-start) !important;
+    min-height: var(--top-stack-start) !important;
+    position: relative !important;
+  }
+  .stack-top,
+  .worker-head {
+    padding: 58px 22px 0 !important;
+    align-items: flex-start !important;
+  }
+  .detail-page,
+  .booking-page,
+  .create-page {
+    padding: 58px 18px 104px !important;
+    gap: 0 !important;
+    position: relative !important;
+  }
+  .detail-nav,
+  .booking-top,
+  .create-top {
+    height: 48px !important;
+    min-height: 48px !important;
+    padding: 0 2px 0 !important;
+    margin: 0 !important;
+  }
+  .stack-cards {
+    height: 704px !important;
+    margin: 0 4px 0 !important;
+  }
+  .worker-panel {
+    top: var(--top-stack-start) !important;
+    bottom: 18px !important;
+  }
+  .branch-title {
+    position: absolute !important;
+    right: 22px !important;
+    bottom: -1px !important;
+    height: 32px !important;
+    min-height: 32px !important;
+    line-height: 32px !important;
+    background: var(--linko-navy) !important;
+    color: #fff !important;
+  }
+  .page-tab,
+  #s8 .flow-title,
+  #s9 .flow-title {
+    height: 32px !important;
+    min-height: 32px !important;
+    line-height: 32px !important;
+    background: var(--linko-navy) !important;
+    color: #fff !important;
+  }
+  .detail-page > .page-tab,
+  .booking-page > .page-tab {
+    position: absolute !important;
+    right: 26px !important;
+    top: 74px !important;
+    margin: 0 !important;
+    z-index: 3 !important;
+  }
+  #s10 .page-tab {
+    position: absolute !important;
+    right: 26px !important;
+    top: 74px !important;
+    margin: 0 !important;
+    z-index: 3 !important;
+  }
+  .host-intro-card,
+  .booking-card,
+  #s8 .status-card:first-child,
+  #s9 .status-card:first-child,
+  #s10 .create-card:first-of-type {
+    border-top-right-radius: 0 !important;
+  }
+  .host-intro-card,
+  .activity-detail-card,
+  .location-detail-card,
+  .booking-card,
+  .booking-map-card,
+  .booking-video-card,
+  .status-card,
+  .create-card {
+    margin-bottom: var(--stack-gap) !important;
+  }
+  .flow-hero {
+    display: flex !important;
+    align-items: flex-start !important;
+    padding: 58px 24px 0 !important;
+  }
+  #s8 .flow-title,
+  #s9 .flow-title {
+    position: absolute !important;
+    right: 26px !important;
+    bottom: -1px !important;
+    margin: 0 !important;
+    width: fit-content !important;
+    padding: 0 17px 0 20px !important;
+    font-size: 15.5px !important;
+    text-transform: none !important;
+    z-index: 3 !important;
+  }
+  #s8 .flow-body,
+  #s9 .flow-body {
+    height: calc(100% - var(--top-stack-start)) !important;
+    padding: 0 18px 26px !important;
+  }
+
+  .preference-card,
+  .worker-cards.stack-cards .preference-card {
+    background:
+      linear-gradient(160deg, rgba(255,255,255,0.16), transparent 38%),
+      rgba(237,75,0,0.82) !important;
+    border: 1px solid rgba(255,255,255,0.2) !important;
+    color: #fff !important;
+    backdrop-filter: blur(12px) saturate(1.08) !important;
+    -webkit-backdrop-filter: blur(12px) saturate(1.08) !important;
+  }
+  .preference-card *,
+  .worker-cards.stack-cards .preference-card * {
+    color: #fff !important;
+  }
+  .preference-edit {
+    color: #fff !important;
+  }
+  .stack-blob,
+  .worker-stack-blob {
+    left: 167px !important;
+    top: 406px !important;
+    background:
+      radial-gradient(circle at 32% 18%, rgba(255,255,255,0.34), transparent 24%),
+      var(--linko-orange-grad) !important;
+  }
+  .worker-cards.stack-cards {
+    height: 704px !important;
+    margin: 0 4px 0 !important;
+  }
+
+  .host-avatar-large {
+    background:
+      linear-gradient(160deg, rgba(255,255,255,0.24), transparent 36%),
+      linear-gradient(135deg, #001b5e 0%, #0030a4 100%) !important;
+  }
+  .booking-check {
+    background:
+      linear-gradient(160deg, rgba(255,255,255,0.24), transparent 36%),
+      linear-gradient(135deg, #001b5e 0%, #0030a4 100%) !important;
+    color: #fff !important;
+  }
+  .booking-video-card {
+    display: block !important;
+    height: 188px !important;
+    min-height: 188px !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    margin: 0 0 var(--stack-gap) !important;
+  }
+  .booking-video-card .join-map-box {
+    display: block !important;
+    height: 100% !important;
+    border-radius: 24px !important;
+    background: #001b5e !important;
+    overflow: hidden !important;
+  }
+  .booking-video-card .belonging-video {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    display: block !important;
+  }
+  .booking-video-card + .booking-map-card {
+    margin-top: 0 !important;
+  }
+
+  .unlock-card,
+  .unlock-card .status-copy,
+  .unlock-card .status-copy strong,
+  .unlock-card .status-copy span {
+    color: #fff !important;
+  }
+  .unlock-card {
+    background:
+      linear-gradient(160deg, rgba(255,255,255,0.12), transparent 38%),
+      var(--linko-navy) !important;
+  }
+  .unlock-card .unlock-badge {
+    background: var(--linko-orange) !important;
+    color: #fff !important;
+  }
+
+  #s10 {
+    background:
+      radial-gradient(circle at 24% 18%, rgba(255,73,0,0.34), transparent 28%),
+      radial-gradient(circle at 88% 78%, rgba(255,179,71,0.22), transparent 26%),
+      linear-gradient(180deg, #0a2a7a 0%, #001b5e 50%, #000a1f 100%) !important;
+    color: #fff !important;
+  }
+  #s10::before {
+    display: none !important;
+  }
+  #s10 .create-title,
+  #s10 .create-field,
+  #s10 .create-card strong {
+    color: #fff !important;
+  }
+  #s10 .create-sub,
+  #s10 .create-hint,
+  #s10 .create-card p,
+  #s10 .segment-label {
+    color: rgba(255,255,255,0.68) !important;
+  }
+  #s10 .create-card {
+    background: rgba(255,255,255,0.1) !important;
+    border: 1px solid rgba(255,255,255,0.16) !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.12), 0 18px 36px rgba(0,0,0,0.22) !important;
+  }
+  #s10 .create-label {
+    background: var(--linko-orange) !important;
+    color: #fff !important;
+  }
+  #s10 .create-segments .segment-control {
+    background: rgba(255,255,255,0.09) !important;
+    border-color: rgba(255,255,255,0.14) !important;
+  }
+  #s10 .create-segments .segment-control button {
+    color: rgba(255,255,255,0.92) !important;
+  }
+  #s10 .create-segments .segment-control button.on {
+    background: var(--linko-orange) !important;
+    color: #fff !important;
+  }
+  #s10 .create-button {
+    background: var(--linko-orange) !important;
+    color: #fff !important;
+    box-shadow: 0 16px 30px rgba(255,73,0,0.28) !important;
+  }
+  #s10 .create-secondary {
+    background: rgba(255,255,255,0.08) !important;
+    color: #fff !important;
+    border: 1px solid rgba(255,255,255,0.18) !important;
+  }
+  #s10.publishing .publish-stage {
+    display: flex !important;
+  }
+  #s10.publishing .publish-orb:not(.is-finishing) {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    background: linear-gradient(180deg, #001b5e 0%, #002fa0 60%, #001040 100%) !important;
+    color: #fff !important;
+  }
+  #s10.publishing .publish-orb span {
+    color: #fff !important;
+  }
+
+  /* ══════════════════════════════
+     BRANCH SCREEN FIX — focused pass
+  ══════════════════════════════ */
+  .ios-status-bar {
+    color: #000 !important;
+    text-shadow: none !important;
+  }
+  .phone:has(#s5.active) .ios-status-bar,
+  .phone:has(#s6.active) .ios-status-bar,
+  .phone:has(#s8.active) .ios-status-bar,
+  .phone:has(#s9.active) .ios-status-bar,
+  .phone:has(#s10.active) .ios-status-bar {
+    color: #000 !important;
+  }
+  #s2 .s2-logo-img,
+  #s2 .partner-logo {
+    filter: brightness(0) saturate(100%) invert(18%) sepia(98%) saturate(6661%) hue-rotate(227deg) brightness(102%) contrast(105%) !important;
+  }
+  #s2 .s2-greeting,
+  #s2 .s2-question,
+  #s2 .s2-copy {
+    color: var(--linko-blue) !important;
+  }
+  #s2 .s2-copy {
+    opacity: 0.84;
+  }
+
+  .preference-card,
+  .worker-cards.stack-cards .preference-card {
+    background:
+      radial-gradient(circle at 32% 18%, rgba(255,255,255,0.3), transparent 24%),
+      var(--linko-orange-grad) !important;
+    border: 1px solid rgba(255,255,255,0.32) !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.44),
+      0 16px 34px rgba(237,75,0,0.18) !important;
+  }
+  .preference-card,
+  .preference-card *,
+  .worker-cards.stack-cards .preference-card,
+  .worker-cards.stack-cards .preference-card *,
+  .preference-card .preference-overview div,
+  .worker-cards.stack-cards .preference-card .preference-overview div,
+  .preference-card .preference-tags span,
+  .worker-cards.stack-cards .preference-card .preference-tags span {
+    color: #fff !important;
+  }
+  .preference-card .preference-tags span,
+  .worker-cards.stack-cards .preference-card .preference-tags span {
+    border-color: rgba(255,255,255,0.34) !important;
+    background: rgba(255,255,255,0.12) !important;
+  }
+
+  .stack-blob,
+  .worker-stack-blob {
+    left: 167px !important;
+    top: 393px !important;
+    width: 50px !important;
+    height: 70px !important;
+    border-radius: 22px !important;
+  }
+
+  .worker-phone-frame .branch-title {
+    right: 22px !important;
+    width: auto !important;
+    max-width: none !important;
+    padding: 0 17px 0 20px !important;
+    font-size: 15.5px !important;
+    letter-spacing: 0.45px !important;
+    white-space: nowrap !important;
+  }
+  .worker-phone-frame .branch-title::before {
+    left: -15px !important;
+    width: 16px !important;
+  }
+
+  #stackSlide .stack-top .branch-title,
+  .worker-phone-frame .worker-head .branch-title {
+    position: absolute !important;
+    right: 22px !important;
+    bottom: -1px !important;
+    height: 32px !important;
+    min-height: 32px !important;
+    line-height: 32px !important;
+    padding: 0 17px 0 20px !important;
+    font-size: 15.5px !important;
+    font-weight: 1000 !important;
+    letter-spacing: 0.45px !important;
+    white-space: nowrap !important;
+  }
+  #stackSlide .stack-top .branch-title {
+    z-index: 12 !important;
+    transition:
+      right 0.52s cubic-bezier(0.22, 1, 0.36, 1),
+      bottom 0.52s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.52s cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 0.32s ease !important;
+  }
+  #s4-overlay.stack-expanded #stackSlide .stack-top .branch-title {
+    right: 19px !important;
+    bottom: -35px !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .worker-phone-frame .worker-head .branch-title {
+    right: 8px !important;
+    bottom: -1px !important;
+  }
+  #stackSlide .stack-top .branch-title::before,
+  .worker-phone-frame .worker-head .branch-title::before {
+    left: -15px !important;
+    width: 16px !important;
+  }
+
+  #s4-overlay,
+  .worker-phone-frame .worker-screen {
+    text-transform: none !important;
+  }
+
+  .worker-cards.stack-cards .worker-card,
+  .worker-cards.stack-cards .rec-card-shell {
+    transition:
+      left 0.42s cubic-bezier(0.4,0,0.2,1),
+      top 0.42s cubic-bezier(0.4,0,0.2,1),
+      width 0.42s cubic-bezier(0.4,0,0.2,1),
+      height 0.42s cubic-bezier(0.4,0,0.2,1),
+      transform 0.42s cubic-bezier(0.4,0,0.2,1),
+      opacity 0.34s ease,
+      box-shadow 0.42s ease !important;
+  }
+  .worker-cards.stack-cards.is-expanded .preference-card:not(.expanded),
+  .worker-cards.stack-cards.is-expanded .rec-card-shell:not(.expanded) {
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+
+  .phone-wrapper.worker-connecting .worker-head,
+  .phone-wrapper.worker-connecting .worker-panel,
+  .phone-wrapper.worker-connecting .worker-stack-blob {
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+  .phone-wrapper.worker-connecting .worker-phone::after {
+    content: none !important;
+    display: none !important;
+  }
+  .worker-algo {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.48s ease;
+    background: var(--linko-sky);
+  }
+  .phone-wrapper.worker-connecting .worker-algo {
+    opacity: 1;
+  }
+  .worker-algo-logo {
+    position: absolute;
+    left: 28px;
+    top: 74px;
+    color: var(--linko-blue);
+    font-size: 20px;
+    font-weight: 950;
+    letter-spacing: -0.6px;
+  }
+  .worker-algo-partner {
+    position: absolute;
+    right: 28px;
+    top: 74px;
+    color: var(--linko-blue);
+    font-size: 12px;
+    line-height: 1.05;
+    text-align: right;
+    font-weight: 950;
+    letter-spacing: -0.2px;
+  }
+  .worker-algo-radar {
+    position: absolute;
+    left: 50%;
+    top: 48%;
+    width: 244px;
+    height: 244px;
+    transform: translate(-50%, -50%);
+    display: grid;
+    place-items: center;
+  }
+  .worker-algo-radar::before,
+  .worker-algo-radar::after {
+    content: "";
+    position: absolute;
+    border-radius: 50%;
+    border: 2px solid rgba(0,73,255,0.18);
+    animation: radarBreath 3.6s ease-in-out infinite;
+  }
+  .worker-algo-radar::before {
+    width: 166px;
+    height: 166px;
+  }
+  .worker-algo-radar::after {
+    width: 226px;
+    height: 226px;
+    animation-delay: 0.4s;
+  }
+  .worker-algo-blob {
+    width: 92px;
+    height: 116px;
+    border-radius: 46px;
+    display: grid;
+    place-items: center;
+    background: var(--linko-orange-grad);
+    box-shadow: 0 18px 40px rgba(237,75,0,0.22);
+    animation: btnPulse 4s ease-in-out infinite;
+    z-index: 1;
+  }
+  .worker-algo-blob img {
+    width: 34px;
+    height: 34px;
+    object-fit: contain;
+    filter: brightness(0) invert(1);
+  }
+  .worker-algo-chip {
+    position: absolute;
+    z-index: 2;
+    padding: 7px 10px;
+    border-radius: 999px;
+    color: #fff;
+    background: rgba(0,73,255,0.82);
+    border: 1px solid rgba(255,255,255,0.36);
+    box-shadow: 0 10px 24px rgba(0,73,255,0.16);
+    font-size: 10px;
+    font-weight: 900;
+    white-space: nowrap;
+  }
+  .worker-algo-chip:nth-child(2) { top: 26px; left: 50%; transform: translateX(-50%); }
+  .worker-algo-chip:nth-child(3) { top: 88px; left: 0; }
+  .worker-algo-chip:nth-child(4) { top: 88px; right: 0; }
+  .worker-algo-chip:nth-child(5) { bottom: 28px; left: 50%; transform: translateX(-50%); }
+  .worker-algo-status {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 104px;
+    color: #fff;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 950;
+    text-shadow: 0 2px 14px rgba(0,27,94,0.22);
+  }
+
+  /* ══════════════════════════════
+     FINAL CLEANUP PASS — current request
+  ══════════════════════════════ */
+  :root {
+    --linko-sky-soft: linear-gradient(180deg, #f7fcff 0%, #a8c7ff 48%, #3375ff 100%);
+  }
+
+  #s2,
+  .worker-algo {
+    background: var(--linko-sky-soft) !important;
+  }
+  #s2 .s2-logo-img,
+  #s2 .partner-logo,
+  .worker-algo .s2-logo-img,
+  .worker-algo .partner-logo {
+    opacity: 0.72 !important;
+    filter: brightness(0) saturate(100%) invert(18%) sepia(98%) saturate(6661%) hue-rotate(227deg) brightness(102%) contrast(105%) !important;
+  }
+  #s2 .s2-greeting,
+  #s2 .s2-question,
+  #s2 .s2-copy {
+    color: rgba(0,73,255,0.9) !important;
+  }
+  #s2 .s2-copy {
+    opacity: 0.9 !important;
+  }
+
+  .phone-wrapper.worker-mode .phone-frame:not(.worker-phone-frame) {
+    transform: none !important;
+  }
+  .worker-phone-frame {
+    top: 44px !important;
+  }
+  .phone-wrapper.worker-mode .worker-phone-frame {
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transform: translateX(-50%) translateX(220px) scale(1) !important;
+  }
+
+  .worker-algo {
+    overflow: hidden !important;
+  }
+  .worker-algo .worker-cloned-nav {
+    opacity: 1 !important;
+  }
+  .worker-algo-logo,
+  .worker-algo-partner,
+  .worker-algo-radar,
+  .worker-algo-status {
+    display: none !important;
+  }
+  .worker-algo-anchor {
+    position: absolute !important;
+    left: 50% !important;
+    top: 49% !important;
+    transform: translate(-50%, -50%) !important;
+    width: 280px !important;
+    height: 280px !important;
+  }
+  .worker-algo .worker-radar-wrap {
+    opacity: 1 !important;
+  }
+  #workerOrbitTags {
+    position: absolute !important;
+    inset: 0 !important;
+  }
+  .worker-algo .worker-algo-btn {
+    width: 80px !important;
+    height: 100px !important;
+    border-radius: 40px !important;
+    background:
+      radial-gradient(circle at 32% 18%, rgba(255,255,255,0.34), transparent 24%),
+      var(--linko-orange-grad) !important;
+    box-shadow: 0 18px 46px rgba(0,73,255,0.18), 0 18px 34px rgba(237,75,0,0.22) !important;
+    animation: btnPulse 4s ease-in-out infinite !important;
+    cursor: default !important;
+  }
+  .worker-algo .worker-algo-btn .blob-mark {
+    display: block !important;
+    opacity: 1 !important;
+    width: 34px !important;
+    height: 34px !important;
+    filter: brightness(0) invert(1) !important;
+  }
+  .worker-algo .orbit-tag {
+    background: rgba(255,255,255,0.22) !important;
+    color: #fff !important;
+    border-color: rgba(255,255,255,0.3) !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    padding: 5px 11px !important;
+  }
+  .worker-connect-label {
+    position: absolute !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 104px !important;
+    text-align: center !important;
+    opacity: 1 !important;
+  }
+
+  .stack-blob,
+  .worker-stack-blob {
+    left: 167px !important;
+    top: 393px !important;
+    width: 50px !important;
+    height: 70px !important;
+    border-radius: 22px !important;
+  }
+
+  .worker-card-avatar img[alt="Sam R."] {
+    object-position: center top !important;
+  }
+  .worker-card-photo img[alt="Sam R."] {
+    object-fit: cover !important;
+    object-position: center center !important;
+  }
+
+  #s6 .booking-check {
+    display: none !important;
+  }
+  #s6 .booking-kicker {
+    display: inline-flex !important;
+    align-items: center !important;
+    width: fit-content !important;
+    max-width: 100% !important;
+    border-radius: 999px !important;
+    padding: 7px 12px !important;
+    margin: 0 0 12px !important;
+    background: var(--linko-blue) !important;
+    color: #fff !important;
+    font-size: 11px !important;
+    font-weight: 900 !important;
+    line-height: 1 !important;
+    letter-spacing: 0.2px !important;
+    text-transform: none !important;
+  }
+
+  #s9 .unlock-card .unlock-badge {
+    background: var(--linko-blue) !important;
+    color: #fff !important;
+  }
+
+  #s10:not(.publishing):not(.published) {
+    background: var(--linko-sky-soft) !important;
+    color: var(--linko-ink) !important;
+  }
+  #s10:not(.publishing):not(.published)::before {
+    display: block !important;
+    content: "" !important;
+    position: absolute !important;
+    inset: 0 !important;
+    background:
+      radial-gradient(circle at 42% 40%, rgba(255,255,255,0.42), rgba(255,255,255,0.12) 42%, transparent 68%),
+      rgba(243,243,235,0.18) !important;
+    pointer-events: none !important;
+    z-index: 0 !important;
+  }
+  #s10:not(.publishing):not(.published) .create-page {
+    position: relative !important;
+    z-index: 1 !important;
+    color: var(--linko-ink) !important;
+  }
+  #s10:not(.publishing):not(.published) .create-card {
+    background: rgba(255,255,255,0.58) !important;
+    border: 1px solid rgba(255,255,255,0.54) !important;
+    color: var(--linko-ink) !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.72),
+      inset 0 -18px 34px rgba(255,255,255,0.13),
+      0 18px 42px rgba(0,27,94,0.13) !important;
+    backdrop-filter: blur(18px) saturate(1.16) !important;
+    -webkit-backdrop-filter: blur(18px) saturate(1.16) !important;
+  }
+  #s10:not(.publishing):not(.published) .create-intro-card .create-title,
+  #s10:not(.publishing):not(.published) .create-intro-card .create-sub {
+    display: none !important;
+  }
+  #s10:not(.publishing):not(.published) .create-label {
+    display: inline-flex !important;
+    align-items: center !important;
+    width: fit-content !important;
+    border-radius: 999px !important;
+    padding: 7px 12px !important;
+    background: var(--linko-blue) !important;
+    color: #fff !important;
+    font-size: 11px !important;
+    font-weight: 900 !important;
+    text-transform: none !important;
+    letter-spacing: 0.1px !important;
+  }
+  #s10:not(.publishing):not(.published) .create-title,
+  #s10:not(.publishing):not(.published) .create-field,
+  #s10:not(.publishing):not(.published) .create-card strong,
+  #s10:not(.publishing):not(.published) .segment-label {
+    color: var(--linko-ink) !important;
+  }
+  #s10:not(.publishing):not(.published) .create-sub,
+  #s10:not(.publishing):not(.published) .create-hint,
+  #s10:not(.publishing):not(.published) .create-card p {
+    color: rgba(0,11,31,0.72) !important;
+  }
+  #s10:not(.publishing):not(.published) .create-segments .segment-control {
+    background: rgba(255,255,255,0.2) !important;
+    border-color: rgba(255,255,255,0.36) !important;
+  }
+  #s10:not(.publishing):not(.published) .create-segments .segment-control button {
+    color: rgba(0,11,31,0.68) !important;
+  }
+  #s10:not(.publishing):not(.published) .create-segments .segment-control button.on {
+    background: var(--linko-orange) !important;
+    color: #fff !important;
+  }
+  #s10:not(.publishing):not(.published) .create-button {
+    background: var(--linko-orange) !important;
+    color: #fff !important;
+    border: none !important;
+    box-shadow: 0 16px 30px rgba(237,75,0,0.22) !important;
+  }
+  #s10:not(.publishing):not(.published) .create-secondary {
+    background: rgba(255,255,255,0.18) !important;
+    color: var(--linko-ink) !important;
+    border: 1.5px solid rgba(0,11,31,0.16) !important;
+  }
+  #s6 .booking-page,
+  #s8 .flow-body,
+  #s9 .flow-body,
+  #s10 .create-page {
+    padding-bottom: 104px !important;
+  }
+  #s6 .booking-page > .booking-note {
+    margin: 0 0 var(--stack-gap) !important;
+    padding: 14px 16px !important;
+    border-radius: 20px !important;
+    background: rgba(255,255,255,0.42) !important;
+    border: 1px solid rgba(255,255,255,0.38) !important;
+    backdrop-filter: blur(14px) !important;
+    -webkit-backdrop-filter: blur(14px) !important;
+  }
+  #s6 .booking-actions-card,
+  #s8 .feedback-actions,
+  #s9 .credit-actions,
+  #s10 .create-actions {
+    position: absolute;
+    left: 18px;
+    right: 18px;
+    bottom: 0;
+    z-index: 6;
+    margin-top: 0;
+    display: grid;
+    grid-template-columns: 1fr 1.25fr;
+    gap: 9px;
+    padding: 8px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.24);
+    border: 1px solid rgba(255,255,255,0.3);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    box-shadow: 0 14px 32px rgba(0,27,94,0.12);
+    transition: opacity 0.42s ease, transform 0.42s ease;
+  }
+  #s6 .booking-actions-card .btn-primary,
+  #s6 .booking-actions-card .btn-ghost,
+  #s8 .feedback-actions .btn-primary,
+  #s8 .feedback-actions .btn-ghost,
+  #s9 .credit-actions .btn-primary,
+  #s9 .credit-actions .btn-ghost,
+  #s10 .create-actions .create-button,
+  #s10 .create-actions .create-secondary {
+    min-height: 46px;
+    padding: 13px 12px;
+    font-size: 13px;
+  }
+  #s10.publishing .create-actions {
+    opacity: 0;
+    transform: scale(0.96);
+    pointer-events: none;
+  }
+
+  #s10.publishing {
+    background: linear-gradient(180deg, #ffb47a 0%, #ff7a2f 46%, #ed4b00 100%) !important;
+  }
+  #s10.publishing::before {
+    display: none !important;
+  }
+  #s10.publishing .publish-stage {
+    display: flex !important;
+    position: absolute !important;
+    inset: 0 !important;
+    z-index: 4 !important;
+    align-items: center !important;
+    justify-content: center !important;
+    overflow: hidden !important;
+  }
+  #s10.publishing:not(.published) .publish-orb:not(.is-finishing) {
+    display: flex !important;
+    position: relative !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 160px !important;
+    height: 220px !important;
+    border-radius: 80px !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    background: linear-gradient(180deg, #6fa0ff 0%, #0049ff 54%, #0030a8 100%) !important;
+    color: #fff !important;
+    box-shadow: 0 18px 46px rgba(0,73,255,0.30) !important;
+    z-index: 4 !important;
+    overflow: visible !important;
+    transform-origin: center center !important;
+    animation:
+      publishOrbIn 0.72s cubic-bezier(0.22,1,0.36,1) both,
+      publishStartBlobAlive 4.8s ease-in-out 0.72s infinite !important;
+  }
+  #s10.publishing:not(.published) .publish-orb:not(.is-finishing)::before {
+    display: none !important;
+  }
+  #s10.publishing:not(.published) .publish-orb:not(.is-finishing)::after {
+    display: none !important;
+  }
+  #s10.publishing:not(.published) .publish-orb span {
+    color: #fff !important;
+    opacity: 1;
+  }
+  #s10.publishing:not(.published) .publish-orb.is-loop-tapping {
+    width: 160px !important;
+    height: 220px !important;
+    border-radius: 80px !important;
+    box-shadow: 0 20px 52px rgba(0,73,255,0.34) !important;
+    animation: publishStartBlobTapAlive 3.8s ease-in-out infinite !important;
+  }
+  #s10.publishing:not(.published) .publish-orb.is-loop-tapping span {
+    opacity: 1 !important;
+    transform: none;
+  }
+  .publish-radar-loop {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 280px;
+    height: 280px;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.6s ease;
+    z-index: 2;
+  }
+  .publish-radar-loop.on {
+    opacity: 1;
+  }
+  .publish-radar-loop .ring {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    border: 1.5px solid rgba(255,255,255,0.4);
+    border-radius: 50%;
+    animation: publishRadarBreath 3.6s ease-in-out infinite;
+  }
+  .publish-radar-loop .r1 {
+    width: 110px;
+    height: 110px;
+    margin: -55px 0 0 -55px;
+    animation-delay: 0s;
+    animation-duration: 3.2s;
+  }
+  .publish-radar-loop .r2 {
+    width: 178px;
+    height: 178px;
+    margin: -89px 0 0 -89px;
+    animation-delay: 0.5s;
+    animation-duration: 3.6s;
+  }
+  .publish-radar-loop .r3 {
+    width: 252px;
+    height: 252px;
+    margin: -126px 0 0 -126px;
+    animation-delay: 1.1s;
+    animation-duration: 4s;
+  }
+  .publish-radar-loop .publish-orbit-tags {
+    position: absolute;
+    inset: 0;
+  }
+  .publish-radar-loop .orbit-tag {
+    position: absolute;
+    background: rgba(255,255,255,0.22);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 5px 11px;
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.3);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.5);
+    transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+    white-space: nowrap;
+  }
+  .publish-radar-loop .orbit-tag.visible {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  @keyframes publishRadarBreath {
+    0%   { opacity: 0;   transform: scale(0.82); box-shadow: 0 0 0 1px rgba(255,255,255,0.1); }
+    40%  { opacity: 0.7; transform: scale(1);    box-shadow: 0 0 0 1.5px rgba(255,255,255,0.3); }
+    100% { opacity: 0;   transform: scale(1.12); box-shadow: 0 0 0 0.5px rgba(255,255,255,0.05); }
+  }
+  #s10.publishing:not(.published) .publish-orb img {
+    display: none !important;
+  }
+  #s10.publishing:not(.published) .publish-orb.is-finishing {
+    display: flex !important;
+    position: relative !important;
+    align-items: center !important;
+    justify-content: center !important;
+    visibility: visible !important;
+    pointer-events: none !important;
+    background: linear-gradient(180deg, #6fa0ff 0%, #0049ff 54%, #0030a8 100%) !important;
+    color: #fff !important;
+    z-index: 4 !important;
+  }
+  #s10.publishing:not(.published) .publish-orb.is-finishing::before,
+  #s10.publishing:not(.published) .publish-orb.is-finishing::after {
+    opacity: 0 !important;
+    animation: none !important;
+  }
+  @keyframes publishStartBlobAlive {
+    0%, 100% {
+      transform: translate3d(0, 0, 0) scaleX(1) scaleY(1);
+      border-radius: 80px;
+      box-shadow: 0 18px 46px rgba(0,73,255,0.30);
+    }
+    36% {
+      transform: translate3d(0, -7px, 0) scaleX(1.04) scaleY(0.96);
+      border-radius: 92px 72px 88px 76px;
+      box-shadow: 0 24px 58px rgba(0,73,255,0.38);
+    }
+    68% {
+      transform: translate3d(0, 5px, 0) scaleX(0.98) scaleY(1.03);
+      border-radius: 74px 92px 78px 90px;
+      box-shadow: 0 15px 42px rgba(0,73,255,0.28);
+    }
+  }
+  @keyframes publishStartBlobTapAlive {
+    0%, 100% {
+      transform: translate3d(0, 1px, 0) scale(0.94);
+      border-radius: 80px;
+    }
+    46% {
+      transform: translate3d(0, -5px, 0) scaleX(0.98) scaleY(0.92);
+      border-radius: 90px 72px 88px 74px;
+    }
+  }
+  @keyframes publishStartBlobHalo {
+    0%, 100% { transform: scale(0.96); opacity: 0.36; }
+    42% { transform: scale(1.08); opacity: 0.58; }
+    72% { transform: scale(1.02); opacity: 0.42; }
+  }
+  @keyframes publishStartBlobRing {
+    0% { transform: scale(0.78); opacity: 0; }
+    24% { opacity: 0.34; }
+    72% { opacity: 0.12; }
+    100% { transform: scale(1.18); opacity: 0; }
+  }
+  #s10.publishing.published,
+  #s10.published {
+    background: #fff !important;
+    color: var(--linko-orange) !important;
+  }
+  #s10.publishing.published::before,
+  #s10.published::before {
+    display: none !important;
+  }
+  #s10.publishing.published .publish-stage,
+  #s10.published .publish-stage {
+    display: flex !important;
+    position: absolute !important;
+    inset: 0 !important;
+    align-items: center !important;
+    justify-content: center !important;
+    z-index: 4 !important;
+    background: #fff !important;
+  }
+  #s10.publishing.published .publish-lines,
+  #s10.publishing.published .publish-name,
+  #s10.publishing.published .publish-orb,
+  #s10.published .publish-lines,
+  #s10.published .publish-name,
+  #s10.published .publish-orb {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
+  #s10.publishing.published .publish-finale,
+  #s10.published .publish-finale {
+    display: flex !important;
+    color: var(--linko-orange) !important;
+  }
+  #s10.publishing.published .publish-finale div,
+  #s10.published .publish-finale div {
+    color: var(--linko-orange) !important;
+  }
+  #s10.publishing.published .publish-finale img,
+  #s10.published .publish-finale img {
+    filter: none !important;
+  }
+  .ux-modal-backdrop,
+  .chat-sheet-backdrop,
+  .host-keyboard-backdrop {
+    position: absolute;
+    inset: 0;
+    z-index: 180;
+    display: none;
+    align-items: flex-end;
+    justify-content: center;
+    background: rgba(0,11,31,0.22);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+  }
+  .ux-modal-backdrop.open,
+  .chat-sheet-backdrop.open,
+  .host-keyboard-backdrop.open { display: flex; }
+  .ux-modal-card {
+    width: calc(100% - 34px);
+    max-height: 74%;
+    overflow: auto;
+    margin: 0 17px 22px;
+    border-radius: 28px;
+    padding: 18px;
+    color: #000b1f;
+    background: rgba(238,247,255,0.9);
+    box-shadow: 0 22px 44px rgba(0,11,31,0.22), inset 0 0 0 1.2px rgba(255,255,255,0.72);
+    backdrop-filter: blur(18px) saturate(1.14);
+    -webkit-backdrop-filter: blur(18px) saturate(1.14);
+    animation: modalRise 0.34s cubic-bezier(0.22,1,0.36,1) both;
+  }
+  @keyframes modalRise {
+    from { opacity: 0; transform: translateY(26px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .ux-modal-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+  .ux-modal-label,
+  .community-pill {
+    display: inline-flex;
+    align-items: center;
+    width: fit-content;
+    border-radius: 999px;
+    padding: 8px 12px;
+    background: var(--linko-blue);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 900;
+  }
+  .ux-modal-close {
+    width: 34px;
+    height: 34px;
+    border: 0;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.55);
+    color: #000b1f;
+    font-size: 18px;
+  }
+  .review-list,
+  .community-list { display: grid; gap: 10px; }
+  .review-item,
+  .community-item,
+  .support-option {
+    border-radius: 18px;
+    padding: 12px;
+    background: rgba(255,255,255,0.52);
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.56);
+  }
+  .review-item strong,
+  .community-item strong {
+    display: block;
+    font-size: 13px;
+    margin-bottom: 4px;
+  }
+  .review-item span,
+  .community-item span,
+  .support-option span {
+    display: block;
+    font-size: 12px;
+    line-height: 1.35;
+    color: rgba(0,11,31,0.72);
+  }
+  .support-option.on {
+    background: var(--linko-orange);
+    color: #fff;
+  }
+  .support-option.on span { color: rgba(255,255,255,0.86); }
+  .expanded-map-box {
+    border-radius: 24px;
+    overflow: hidden;
+    background: rgba(255,255,255,0.5);
+    min-height: 232px;
+  }
+  .host-trust.rating-clickable,
+  .join-map-box.map-clickable,
+  .community-item,
+  .support-option,
+  .worker-memory-tile,
+  .create-intro-card.is-editable { cursor: pointer; }
+  .worker-memory-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin: 12px 0 8px;
+  }
+  .worker-memory-tile {
+    aspect-ratio: 1;
+    border: 0;
+    border-radius: 14px;
+    overflow: hidden;
+    padding: 0;
+    background: linear-gradient(135deg, rgba(0,73,255,0.14), rgba(237,75,0,0.12)), rgba(255,255,255,0.42);
+  }
+  .worker-memory-tile img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .worker-memory-tile span {
+    display: grid;
+    place-items: center;
+    height: 100%;
+    padding: 8px;
+    color: #001b5e;
+    font-size: 10px;
+    font-weight: 900;
+    text-align: center;
+  }
+  .worker-card-avatar img {
+    object-fit: cover;
+    object-position: center 28%;
+  }
+  .worker-chat-card {
+    width: calc(100% - 28px);
+    margin: 0 14px;
+    border-radius: 28px 28px 0 0;
+    background: rgba(238,247,255,0.94);
+    padding: 16px 16px 8px;
+    box-shadow: 0 -20px 38px rgba(0,11,31,0.22);
+    animation: modalRise 0.34s cubic-bezier(0.22,1,0.36,1) both;
+  }
+  .chat-thread {
+    min-height: 148px;
+    display: grid;
+    align-content: end;
+    gap: 8px;
+  }
+  .chat-bubble {
+    max-width: 84%;
+    margin-left: auto;
+    border-radius: 18px 18px 5px 18px;
+    padding: 10px 12px;
+    background: var(--linko-blue);
+    color: #fff;
+    font-size: 12px;
+    line-height: 1.36;
+  }
+  .chat-input-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+    border-radius: 999px;
+    padding: 8px 8px 8px 14px;
+    background: rgba(255,255,255,0.72);
+  }
+  .chat-input-row span {
+    flex: 1;
+    min-height: 18px;
+    color: #000b1f;
+    font-size: 12px;
+  }
+  .chat-input-row button {
+    width: 36px;
+    height: 36px;
+    border: 0;
+    border-radius: 50%;
+    background: var(--linko-orange);
+    color: #fff;
+  }
+  .ios-keyboard {
+    margin: 10px -4px 0;
+    padding: 8px 4px 4px;
+    border-radius: 18px 18px 0 0;
+    background: rgba(210,220,238,0.94);
+    display: grid;
+    gap: 6px;
+  }
+  .key-row { display: flex; gap: 5px; justify-content: center; }
+  .key-row span {
+    min-width: 24px;
+    height: 30px;
+    display: grid;
+    place-items: center;
+    border-radius: 7px;
+    background: #fff !important;
+    color: #000b1f;
+    font-size: 11px;
+    font-weight: 800;
+    box-shadow:
+      0 1px 0 rgba(0,11,31,0.12),
+      0 3px 8px rgba(0,11,31,0.08);
+  }
+  .chat-sheet-backdrop.open .key-row span,
+  .host-keyboard-backdrop.open .key-row span {
+    animation: keyTap 1.28s ease-in-out infinite;
+  }
+  .key-row span:nth-child(2n) { animation-delay: 0.08s; }
+  .key-row span:nth-child(3n) { animation-delay: 0.16s; }
+  .key-row span:nth-child(4n) { animation-delay: 0.24s; }
+  @keyframes keyTap {
+    0%, 100% { transform: translateY(0) scale(1); background: #fff; }
+    36% { transform: translateY(1px) scale(0.96); background: #f3f6fb; }
+  }
+
+  #algo-overlay {
+    mix-blend-mode: screen;
+    transition: opacity 0.45s ease !important;
+  }
+  #algo-overlay canvas {
+    opacity: 0 !important;
+  }
+  .live-algo-layer {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    font-family: 'DM Sans', sans-serif;
+    opacity: 0;
+    transition: opacity 0.45s ease;
+  }
+  .live-algo-layer.visible {
+    opacity: 1;
+  }
+  .live-algo-svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+  .live-algo-curve,
+  .live-algo-flow {
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .live-algo-curve {
+    stroke: rgba(255,91,24,0.64);
+    stroke-width: 1.9px;
+    path-length: 1;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    filter:
+      drop-shadow(0 0 5px rgba(255,91,24,0.92))
+      drop-shadow(0 0 18px rgba(255,91,24,0.44));
+    animation:
+      liveLineDraw 2.45s cubic-bezier(0.16,0.78,0.22,1) forwards,
+      liveLineBreathe 5.8s ease-in-out infinite 2.15s;
+  }
+  .live-algo-curve.faint {
+    stroke-width: 1.1px;
+    opacity: 0.55;
+  }
+  .live-algo-curve.blue {
+    stroke: rgba(52,112,255,0.7);
+    filter:
+      drop-shadow(0 0 5px rgba(52,112,255,0.88))
+      drop-shadow(0 0 18px rgba(52,112,255,0.42));
+  }
+  .live-algo-flow {
+    stroke: rgba(255,119,55,0.9);
+    stroke-width: var(--flow-width, 2.7px);
+    stroke-dasharray: var(--flow-dash, 108 530);
+    stroke-dashoffset: var(--flow-start, 660);
+    opacity: 0;
+    filter:
+      drop-shadow(0 0 7px rgba(255,91,24,0.9))
+      drop-shadow(0 0 18px rgba(255,91,24,0.46));
+    animation: liveLineFlow var(--flow-duration, 6.1s) cubic-bezier(0.42,0,0.24,1) infinite;
+  }
+  .live-algo-flow.blue {
+    stroke: rgba(72,132,255,0.92);
+    filter:
+      drop-shadow(0 0 7px rgba(52,112,255,0.9))
+      drop-shadow(0 0 18px rgba(52,112,255,0.46));
+  }
+  .live-algo-flow.faint {
+    opacity: 0;
+    stroke-width: var(--flow-width, 1.7px);
+    stroke-dasharray: var(--flow-dash, 62 620);
+  }
+  @keyframes liveLineDraw {
+    to { stroke-dashoffset: 0; }
+  }
+  @keyframes liveLineBreathe {
+    0%, 100% { opacity: 0.4; stroke-width: 1.32px; }
+    46% { opacity: 0.78; stroke-width: 2.05px; }
+  }
+  @keyframes liveLineFlow {
+    0% { stroke-dashoffset: var(--flow-start, 660); opacity: 0; }
+    7% { opacity: 0.08; }
+    18% { opacity: 0.68; }
+    39% { opacity: 0.44; }
+    58% { opacity: 0.74; }
+    76% { opacity: 0.28; }
+    100% { stroke-dashoffset: var(--flow-end, -660); opacity: 0; }
+  }
+  .live-algo-label {
+    position: fixed;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: rgba(255,91,24,0.98);
+    font-size: 16px;
+    line-height: 1;
+    font-weight: 800;
+    letter-spacing: 0.4px;
+    text-shadow:
+      0 0 6px rgba(237,75,0,0.95),
+      0 0 18px rgba(237,75,0,0.78),
+      0 0 32px rgba(237,75,0,0.42);
+    opacity: 0;
+    transform: translateY(5px);
+    transition: opacity 0.52s ease, transform 0.52s ease;
+    white-space: nowrap;
+    z-index: 2;
+  }
+  .live-algo-label.blue {
+    color: rgba(52,112,255,0.98);
+    text-shadow:
+      0 0 6px rgba(0,73,255,0.92),
+      0 0 18px rgba(0,73,255,0.72),
+      0 0 32px rgba(0,73,255,0.42);
+  }
+  .live-algo-label::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-radius: 999px;
+    background: currentColor;
+    box-shadow: 0 0 10px currentColor, 0 0 22px currentColor;
+  }
+  .live-algo-label.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .live-algo-label.from-left {
+    transform: translate(-100%, 5px);
+  }
+  .live-algo-label.from-left.visible {
+    transform: translate(-100%, 0);
+  }
+
+  /* iPhone 15 Pro frame image */
+  .phone-frame {
+    background:
+      radial-gradient(circle at 18% 8%, rgba(255,255,255,0.34), transparent 20%),
+      radial-gradient(circle at 84% 92%, rgba(114,134,166,0.22), transparent 24%),
+      linear-gradient(112deg, #5f718d 0%, #151b27 18%, #03050a 47%, #1d2635 74%, #7688a2 100%) !important;
+    border-radius: 58px !important;
+    box-shadow:
+      inset 6px 0 9px rgba(255,255,255,0.22),
+      inset -8px 0 15px rgba(0,0,0,0.66),
+      0 0 0 1px rgba(135,158,190,0.34) !important;
+    filter: drop-shadow(0 34px 42px rgba(0,0,0,0.38)) !important;
+  }
+  .phone-frame::before {
+    content: "" !important;
+    display: block !important;
+    position: absolute !important;
+    inset: 0 !important;
+    z-index: 4 !important;
+    pointer-events: none !important;
+    border-radius: inherit !important;
+    background: url("apple-iphone-15-pro-blue-titanium-portrait.png") center / 100% 100% no-repeat !important;
+    clip-path: inset(0 22px 0 22px round 46px) !important;
+  }
+  .phone-frame::after {
+    display: none !important;
+  }
+  .phone {
+    box-shadow:
+      0 0 0 7px rgba(4,7,13,0.96),
+      0 0 0 10px rgba(95,113,141,0.72),
+      0 18px 34px rgba(0,0,0,0.25) !important;
+    z-index: 1;
+  }
+
+  .host-keyboard-backdrop {
+    align-items: flex-end;
+    background: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    pointer-events: none;
+  }
+  .host-keyboard-card { width: 100%; padding: 0 10px 8px; pointer-events: auto; }
+  .host-keyboard-backdrop .host-keyboard-card {
+    width: 100%;
+    padding: 12px 9px 10px;
+    border-radius: 24px 24px 0 0;
+    background: #d9dce2;
+    box-shadow:
+      0 -14px 28px rgba(0,11,31,0.18),
+      inset 0 1px 0 rgba(255,255,255,0.62);
+  }
+  .host-keyboard-backdrop .ios-keyboard {
+    margin: 0;
+    padding: 0;
+    gap: 8px;
+    border-radius: 0;
+    background: transparent;
+  }
+  .host-keyboard-backdrop .key-row {
+    gap: 6px;
+    width: 100%;
+  }
+  .host-keyboard-backdrop .key-row span {
+    flex: 1 1 0;
+    min-width: 0;
+    height: 39px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.86) !important;
+    color: #3c3f44;
+    font-size: 23px;
+    font-weight: 410;
+    letter-spacing: 0;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.95),
+      0 1px 0 rgba(0,0,0,0.14),
+      0 2px 3px rgba(0,11,31,0.1);
+    animation-duration: 1.8s !important;
+  }
+  .host-keyboard-backdrop .key-row:nth-child(2) {
+    padding: 0 17px;
+  }
+  .host-keyboard-backdrop .key-row .record-key-system {
+    flex: 0 0 43px;
+    min-width: 43px;
+    background: rgba(255,255,255,0.84) !important;
+    color: #3f444a;
+    font-size: 22px;
+    font-weight: 420;
+  }
+  .host-keyboard-backdrop .record-space-row .record-key-system {
+    flex: 0 0 80px;
+    min-width: 80px;
+    font-size: 21px;
+  }
+  .host-keyboard-backdrop .record-space-row .record-key-space {
+    flex: 1 1 auto;
+    min-width: 0;
+    font-size: 0;
+  }
+  .host-keyboard-backdrop .record-space-row .record-key-dot {
+    flex: 0 0 42px;
+    min-width: 42px;
+    font-size: 24px;
+  }
+  .host-keyboard-backdrop .record-space-row .record-key-return {
+    flex: 0 0 56px;
+    min-width: 56px;
+    background: #57a5f5 !important;
+    color: #fff;
+    font-size: 31px;
+    font-weight: 330;
+  }
+  .record-keyboard-footer {
+    height: 27px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1px 22px 0;
+    color: #666d75;
+    font-size: 25px;
+    line-height: 1;
+  }
+  .record-keyboard-footer i {
+    font-size: 27px;
+    line-height: 1;
+  }
+  .create-field.empty { color: rgba(0,11,31,0.45); }
+  .create-typing-cursor::after {
+    content: '';
+    display: inline-block;
+    width: 2px;
+    height: 1em;
+    margin-left: 2px;
+    background: currentColor;
+    vertical-align: -2px;
+    animation: blinkCursor 0.76s steps(2,end) infinite;
+  }
+  @keyframes blinkCursor { 50% { opacity: 0; } }
+  .loop-showcase-stage {
+    position: fixed;
+    inset: 0;
+    z-index: 100000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 30px;
+    padding: 86px 70px 74px;
+    background: #fff !important;
+    overflow: hidden;
+  }
+  .loop-showcase-card {
+    position: relative;
+    width: 210px;
+    height: 548px;
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
+    flex: 0 0 auto;
+  }
+  .loop-showcase-title {
+    color: #000b1f !important;
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 0.15px;
+    text-align: center;
+    text-shadow: none;
+    white-space: nowrap;
+    line-height: 12px;
+    height: 16px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    text-transform: uppercase;
+  }
+  .loop-showcase-frame {
+    position: relative;
+    width: 224px;
+    height: 510px;
+    flex: 0 0 auto;
+    overflow: visible;
+  }
+  .loop-showcase-frame iframe {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 700px;
+    height: 960px;
+    border: 0;
+    transform: translate(-50%, -50%) scale(0.505);
+    transform-origin: center center;
+  }
+  .loop-showcase-pair {
+    position: relative;
+    width: 390px;
+    height: 548px;
+    flex: 0 0 auto;
+  }
+  .loop-showcase-pair .loop-showcase-card {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+  .loop-showcase-pair .loop-showcase-card:nth-child(1) { z-index: 2; }
+  .loop-showcase-pair .loop-showcase-card:nth-child(2) {
+    left: 178px;
+    top: 0;
+    z-index: 1;
+  }
+  .loop-showcase-pair.match {
+    width: 390px;
+  }
+  .loop-showcase-pair.match .loop-showcase-card:nth-child(2) {
+    left: 178px;
+    top: 0;
+  }
+  .loop-showcase-card.start-card {
+    margin-left: -4px;
+  }
+  @media (min-width: 5000px) and (min-height: 1800px) {
+    .loop-showcase-stage {
+      gap: 60px;
+      padding: 172px 140px 148px;
+    }
+    .loop-showcase-card {
+      width: 420px;
+      height: 1096px;
+      gap: 20px;
+    }
+    .loop-showcase-title {
+      font-size: 20px;
+      line-height: 24px;
+      height: 32px;
+    }
+    .loop-showcase-frame {
+      width: 448px;
+      height: 1020px;
+    }
+    .loop-showcase-frame iframe {
+      transform: translate(-50%, -50%) scale(1);
+    }
+    .loop-showcase-pair,
+    .loop-showcase-pair.match {
+      width: 780px;
+      height: 1096px;
+    }
+    .loop-showcase-pair .loop-showcase-card:nth-child(2),
+    .loop-showcase-pair.match .loop-showcase-card:nth-child(2) {
+      left: 356px;
+    }
+    .loop-showcase-card.start-card {
+      margin-left: -8px;
+    }
+  }
+  @media (min-width: 10000px) and (min-height: 3500px) {
+    .loop-showcase-stage {
+      gap: 120px;
+      padding: 344px 280px 296px;
+    }
+    .loop-showcase-card {
+      width: 840px;
+      height: 2192px;
+      gap: 40px;
+    }
+    .loop-showcase-title {
+      font-size: 40px;
+      line-height: 48px;
+      height: 64px;
+    }
+    .loop-showcase-frame {
+      width: 896px;
+      height: 2040px;
+    }
+    .loop-showcase-frame iframe {
+      transform: translate(-50%, -50%) scale(2);
+    }
+    .loop-showcase-pair,
+    .loop-showcase-pair.match {
+      width: 1560px;
+      height: 2192px;
+    }
+    .loop-showcase-pair .loop-showcase-card:nth-child(2),
+    .loop-showcase-pair.match .loop-showcase-card:nth-child(2) {
+      left: 712px;
+    }
+    .loop-showcase-card.start-card {
+      margin-left: -16px;
+    }
+  }
+  .loop-pressed {
+    transform: scale(0.96) !important;
+    filter: brightness(0.94);
+  }
+  #s7 .activity-detail-card .detail-section-label {
+    display: inline-flex !important;
+    align-items: center;
+    width: fit-content;
+    margin-bottom: 12px;
+    padding: 5px 10px;
+    border-radius: 12px;
+    background: var(--linko-blue) !important;
+    color: #fff !important;
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 0.4px;
+  }
+  #s7 .action-group {
+    position: absolute;
+    left: 18px;
+    right: 18px;
+    bottom: 0;
+    z-index: 6;
+    grid-template-columns: 1fr 1.25fr;
+    gap: 9px;
+    padding: 8px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.24);
+    border: 1px solid rgba(255,255,255,0.3);
+    box-shadow: 0 14px 32px rgba(0,27,94,0.12);
+  }
+  #s7 .action-group .btn-primary,
+  #s7 .action-group .btn-ghost {
+    min-height: 46px;
+    padding: 13px 12px;
+    font-size: 13px;
+  }
+  #s7 .action-group .btn-primary {
+    background: var(--linko-orange) !important;
+    color: #fff !important;
+    border: none !important;
+  }
+  #s7 .action-group .btn-ghost {
+    background: rgba(255,255,255,0.16) !important;
+    color: var(--linko-ink) !important;
+    border: 1.5px solid rgba(0,11,31,0.18) !important;
+  }
+  .chat-sheet-backdrop .key-row span,
+  .host-keyboard-backdrop .key-row span {
+    background: #fff !important;
+    color: #000b1f !important;
+  }
+  #s7 .community-pill {
+    background: var(--linko-orange) !important;
+    color: #fff !important;
+  }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/p5.min.js"></script>
 </head>
@@ -2401,7 +5464,11 @@
 <div id="algo-overlay" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:5;opacity:0;transition:opacity 2.4s ease;"></div>
 
 <div class="phone-wrapper">
-  <div class="sequence-label" id="seqLabel">Onboarding</div>
+  <div class="sequence-label" id="seqLabel">ONBOARDING</div>
+  <div class="split-sequence-labels" aria-hidden="true">
+    <span>WITH LINKO</span>
+    <span>WITH LINK WORKER</span>
+  </div>
 <div class="phone-frame">
   <div class="phone">
 
@@ -2459,27 +5526,26 @@
 
       <div class="preference-panel one-button-preferences" id="oneButtonPreferences">
         <div class="segment-row">
-          <div class="segment-label">Pressure</div>
+          <div class="segment-label">Path</div>
           <div class="segment-control">
-            <button class="on" onclick="selectSegment(this)">Low</button>
-            <button onclick="selectSegment(this)">Medium</button>
-            <button onclick="selectSegment(this)">Social</button>
+            <button class="on" onclick="selectSegment(this)">Activity Match</button>
+            <button onclick="selectSegment(this)">Link Worker Support</button>
           </div>
         </div>
         <div class="segment-row">
           <div class="segment-label">Distance</div>
           <div class="segment-control">
-            <button class="on" onclick="selectSegment(this)">20 min</button>
+            <button class="on" onclick="selectSegment(this)">Nearby</button>
             <button onclick="selectSegment(this)">40 min</button>
-            <button onclick="selectSegment(this)">Any</button>
+            <button onclick="selectSegment(this)">Flexible</button>
           </div>
         </div>
         <div class="segment-row">
           <div class="segment-label">Setting</div>
           <div class="segment-control">
-            <button class="on" onclick="selectSegment(this)">Indoor</button>
+            <button onclick="selectSegment(this)">Indoor</button>
             <button onclick="selectSegment(this)">Outdoor</button>
-            <button onclick="selectSegment(this)">Either</button>
+            <button class="on" onclick="selectSegment(this)">Either</button>
           </div>
         </div>
         <div class="segment-row">
@@ -2503,6 +5569,9 @@
         <button class="stack-back" onclick="closeMapOverlay()">
           <i class="ti ti-arrow-left"></i>
         </button>
+        <div class="stack-title-group">
+          <div class="branch-title">WITH LINKO</div>
+        </div>
       </div>
 
       <div class="stack-blob">
@@ -2569,6 +5638,7 @@
       <div class="detail-nav">
         <button class="icon-btn" onclick="returnToRecommendations()"><i class="ti ti-arrow-left"></i></button>
       </div>
+      <div class="page-tab">Activity Detail</div>
 
       <section class="host-intro-card">
         <div class="detail-section-label">Host introduction</div>
@@ -2616,7 +5686,60 @@
 
     </div>
     <div class="action-group">
-      <button class="btn-ghost" onclick="returnToRecommendations()">Maybe later</button>
+      <button class="btn-ghost" onclick="openActivityContactSheet()">Contact</button>
+      <button class="btn-primary" onclick="goToJoin()">Confirm</button>
+    </div>
+  </div>
+
+  <!-- ═══ S7: LINK WORKER MATCHED ═══ -->
+  <div class="screen" id="s7">
+    <div class="detail-page">
+      <div class="detail-nav">
+        <button class="icon-btn" onclick="returnToRecommendations()"><i class="ti ti-arrow-left"></i></button>
+      </div>
+      <div class="page-tab">Link worker matched</div>
+
+      <section class="host-intro-card">
+        <div class="detail-section-label">Link-worker introduction</div>
+        <div class="host-main">
+          <div class="host-avatar-large" id="matchedWorkerAvatar">S</div>
+          <div class="host-copy">
+            <div class="host-name" id="matchedWorkerName">Sam R.</div>
+            <div class="host-role" id="matchedWorkerRole">Community navigator · local VCSE support</div>
+          </div>
+        </div>
+        <p class="host-intro-text" id="matchedWorkerIntro">Sam can make the first introduction, confirm access needs, and help you join at a pace that feels manageable.</p>
+        <div class="host-trust-row">
+          <div class="host-trust"><i class="ti ti-message-circle"></i> First message ready</div>
+          <div class="host-trust"><i class="ti ti-shield-check"></i> Linko verified</div>
+        </div>
+      </section>
+
+      <section class="activity-detail-card">
+        <div class="detail-section-label">Experience</div>
+        <h2 class="detail-title-text">Main linked community</h2>
+        <p class="detail-summary-text">Sam mainly connects people into calm neighbourhood groups where hosts know how to make a first visit feel clear and low pressure.</p>
+        <div class="community-list" id="matchedCommunities">
+          <div class="community-item" onclick="openCommunityPopup('Hackney City Farm', 'Gentle outdoor volunteering with clear arrival points and small-group tasks.')">
+            <span class="community-pill">Garden</span>
+            <strong>Hackney City Farm</strong>
+            <span>Small community sessions with steady hosts and simple first steps.</span>
+          </div>
+          <div class="community-item" onclick="openCommunityPopup('The Common Room', 'A low-key indoor space for short chats, coffee, and optional introductions.')">
+            <span class="community-pill">Social</span>
+            <strong>The Common Room</strong>
+            <span>Short indoor meetups for people who want a softer start.</span>
+          </div>
+          <div class="community-item" onclick="openCommunityPopup('Bethnal Green Arts', 'Side-by-side creative activity where conversation can happen naturally.')">
+            <span class="community-pill">Creative</span>
+            <strong>Bethnal Green Arts</strong>
+            <span>Creative groups for when doing feels easier than talking.</span>
+          </div>
+        </div>
+      </section>
+    </div>
+    <div class="action-group">
+      <button class="btn-ghost" onclick="openWorkerChat()">Contact</button>
       <button class="btn-primary" onclick="goToJoin()">Confirm</button>
     </div>
   </div>
@@ -2628,9 +5751,9 @@
         <button class="icon-btn" onclick="goTo('s5')"><i class="ti ti-arrow-left"></i></button>
         <div class="booking-status"><i class="ti ti-circle-check-filled"></i> Confirmed</div>
       </div>
+      <div class="page-tab">Belonging</div>
 
       <section class="booking-card">
-        <div class="booking-check"><i class="ti ti-check"></i></div>
         <div class="booking-kicker">Reserved</div>
         <h2 class="booking-title" id="bookingTitle">Community Garden Session</h2>
         <p class="booking-sub" id="bookingSub">Your place is reserved. The host will meet you at the main farm gate and help you settle in.</p>
@@ -2658,6 +5781,12 @@
         </div>
       </section>
 
+      <section class="booking-video-card booking-map-card">
+        <div class="join-map-box" id="bookingVideo">
+          <video class="belonging-video" src="Belonging.mp4" autoplay muted loop playsinline></video>
+        </div>
+      </section>
+
       <section class="booking-map-card">
         <div class="detail-section-label">Booking route</div>
         <div class="location-head">
@@ -2674,23 +5803,23 @@
         </div>
       </section>
 
-    </div>
-    <section class="booking-actions-card">
       <div class="booking-note" id="bookingNote">
         <i class="ti ti-bell"></i>
         <span>We will remind you before it starts. You can still come quietly and leave early if you need to.</span>
       </div>
-      <div class="booking-actions">
-        <button class="btn-ghost" onclick="contactHost()">Host contact</button>
-        <button class="btn-primary is-disabled" id="completeActivityBtn" onclick="completeActivity()" disabled>Complete activity</button>
-      </div>
+
+    </div>
+    <section class="booking-actions-card">
+      <button class="btn-ghost" onclick="contactHost()">Contact</button>
+      <button class="btn-primary is-disabled" id="completeActivityBtn" onclick="completeActivity()" disabled>Complete</button>
     </section>
   </div>
 
   <!-- ═══ S8: FEEDBACK ═══ -->
   <div class="screen" id="s8">
     <div class="flow-hero">
-      <div class="flow-title">How did it feel?</div>
+      <button class="icon-btn" onclick="goTo('s6')"><i class="ti ti-arrow-left"></i></button>
+      <div class="flow-title">HOW DID IT FEEL?</div>
     </div>
     <div class="flow-body">
       <div class="status-card">
@@ -2714,6 +5843,17 @@
           <button onclick="this.classList.toggle('on')">Same host style</button>
         </div>
       </div>
+      <div class="status-card">
+        <div class="feedback-question">What felt most reassuring?</div>
+        <div class="feedback-chips">
+          <button onclick="this.classList.toggle('on')">Clear arrival</button>
+          <button onclick="this.classList.toggle('on')">Kind host</button>
+          <button onclick="this.classList.toggle('on')">Small group</button>
+          <button onclick="this.classList.toggle('on')">No pressure</button>
+          <button onclick="this.classList.toggle('on')">Easy route</button>
+          <button onclick="this.classList.toggle('on')">Could leave early</button>
+        </div>
+      </div>
       <div class="status-card feedback-credit-card">
         <div class="credit-orb">
           <strong>+2</strong>
@@ -2724,20 +5864,21 @@
           <span>Your participation has been recorded and the partner service receives a simple completion note.</span>
         </div>
       </div>
-      <div class="feedback-actions">
-        <button class="btn-ghost" onclick="submitFeedback()">Skip</button>
-        <button class="btn-primary is-disabled" id="submitFeedbackBtn" onclick="submitFeedback()" disabled>Submit feedback</button>
-      </div>
+    </div>
+    <div class="feedback-actions">
+      <button class="btn-ghost" onclick="submitFeedback()">Skip</button>
+      <button class="btn-primary is-disabled" id="submitFeedbackBtn" onclick="submitFeedback()" disabled>Submit</button>
     </div>
   </div>
 
   <!-- ═══ S9: CREDIT UNLOCK ═══ -->
   <div class="screen" id="s9">
     <div class="flow-hero">
-      <div class="flow-title">Credits added</div>
+      <div class="flow-title">YOUR PROGRESS</div>
     </div>
     <div class="flow-body">
       <div class="status-card credit-progress-card">
+        <div class="progress-section-label">Credit</div>
         <div class="credit-total">
           <strong>10</strong>
           <span>/ 10 credits</span>
@@ -2755,6 +5896,52 @@
           <div class="credit-slot"><img src="linkoOlogo.png" alt=""></div>
         </div>
       </div>
+      <div class="status-card">
+        <div class="progress-section-label">Your Journey</div>
+        <div class="status-copy">
+          <span>Keep going, Aaliyah. Three small steps are becoming a pattern.</span>
+        </div>
+        <svg viewBox="0 0 320 150" class="journey-chart" aria-hidden="true">
+          <defs>
+            <linearGradient id="journeyFill" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#0049ff" stop-opacity="0.22"/>
+              <stop offset="100%" stop-color="#0049ff" stop-opacity="0.02"/>
+            </linearGradient>
+          </defs>
+          <g stroke="rgba(0,11,31,0.08)" stroke-width="1">
+            <path d="M18 28 H300"/>
+            <path d="M18 60 H300"/>
+            <path d="M18 92 H300"/>
+            <path d="M18 124 H300"/>
+          </g>
+          <path d="M18 112 L76 86 L128 72 L182 64 L236 48 L294 28 L294 124 L18 124 Z" fill="url(#journeyFill)"/>
+          <path d="M18 112 C54 98 62 91 76 86 C104 76 108 78 128 72 C156 62 164 68 182 64 C212 56 218 51 236 48 C266 42 274 34 294 28" fill="none" stroke="#0049ff" stroke-width="4" stroke-linecap="round"/>
+          <g fill="#fff" stroke="#0049ff" stroke-width="4">
+            <circle cx="76" cy="86" r="6"/>
+            <circle cx="128" cy="72" r="6"/>
+            <circle cx="182" cy="64" r="6"/>
+            <circle cx="236" cy="48" r="6"/>
+            <circle cx="294" cy="28" r="6"/>
+          </g>
+          <g fill="#000b1f" font-family="DM Sans, sans-serif" font-size="10" font-weight="800">
+            <text x="54" y="144">Week 1</text>
+            <text x="158" y="144">Week 3</text>
+            <text x="254" y="144">Week 5</text>
+          </g>
+          <rect x="212" y="14" width="82" height="22" rx="11" fill="rgba(0,73,255,0.12)"/>
+          <text x="253" y="29" text-anchor="middle" fill="#0049ff" font-family="DM Sans, sans-serif" font-size="10" font-weight="900">steady growth</text>
+        </svg>
+      </div>
+      <div class="status-card">
+        <div class="progress-section-label">Recent Activity</div>
+        <div class="status-copy">
+        </div>
+        <div class="summary-meta" style="margin-top:12px;">
+          <span><i class="ti ti-plant"></i>Community Garden Session · attended · +3</span>
+          <span><i class="ti ti-palette"></i>Community Art Club · joined · +2</span>
+          <span><i class="ti ti-coffee"></i>Café Chat Morning · attended · +2</span>
+        </div>
+      </div>
       <div class="status-card unlock-card">
         <div class="unlock-badge"><i class="ti ti-sparkles"></i> Unlocked</div>
         <div class="status-copy">
@@ -2762,10 +5949,10 @@
           <span>You have enough credits to suggest and host a gentle activity for others in your community.</span>
         </div>
       </div>
-      <div class="credit-actions">
-        <button class="btn-ghost" onclick="goTo('s2')">Find another activity</button>
-        <button class="btn-primary is-disabled" id="createActivityBtn" onclick="goTo('s10')" disabled>Create Activity</button>
-      </div>
+    </div>
+    <div class="credit-actions">
+      <button class="btn-ghost" onclick="goTo('s2')">Find</button>
+      <button class="btn-primary is-disabled" id="createActivityBtn" onclick="goTo('s10')" disabled>Create Activity</button>
     </div>
   </div>
 
@@ -2775,13 +5962,14 @@
       <div class="create-top">
         <button class="icon-btn" onclick="goTo('s9')"><i class="ti ti-arrow-left"></i></button>
       </div>
-      <h2 class="create-title">Host a gentle Linko</h2>
-      <p class="create-sub">Use your credits to help others link, go, and belong.</p>
+      <div class="page-tab">Host a Linko</div>
 
-      <section class="create-card">
+      <section class="create-card create-intro-card is-editable" onclick="openHostIdeaEditor()">
+        <h2 class="create-title">Host a Linko</h2>
+        <p class="create-sub">Use your credits to help others link, go, and belong.</p>
         <div class="create-label">Activity idea</div>
-        <div class="create-field">Quiet tea and sketch table</div>
-        <div class="create-hint">A simple hosted table where people can arrive softly, draw, chat a little, or just sit nearby.</div>
+        <div class="create-field empty" id="hostIdeaTitle">Tap to add an activity idea</div>
+        <div class="create-hint" id="hostIdeaDescription">Add a short description people will see before deciding to join.</div>
       </section>
 
       <section class="create-card">
@@ -2835,11 +6023,10 @@
         <div class="create-field">I'll meet people at the entrance.</div>
         <div class="create-hint">Add the first reassurance people will see before they decide to join.</div>
       </section>
-
-      <div class="create-actions">
-        <button class="create-secondary" onclick="goTo('s9')">Save draft</button>
-        <button class="create-button" onclick="publishLinko()">Publish Linko</button>
-      </div>
+    </div>
+    <div class="create-actions">
+      <button class="create-secondary" onclick="goTo('s9')">Save</button>
+      <button class="create-button" onclick="publishLinko()">Publish</button>
     </div>
     <div class="publish-stage" id="publishStage">
       <svg class="publish-lines" viewBox="0 0 390 844" preserveAspectRatio="none" aria-hidden="true">
@@ -2873,13 +6060,158 @@
         <img src="linkoOlogo2.png" alt="">
       </button>
       <div class="publish-finale" id="publishFinale">
-        <img src="LinkoLogoOrange.png" alt="Linko">
-        <div>Link, Go, Belong</div>
+        <img src="LinkoLogo.png" alt="Linko">
+        <div>link. go. belong</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ux-modal-backdrop" id="ratingPopup" onclick="if(event.target===this)closeUxModal('ratingPopup')">
+    <div class="ux-modal-card">
+      <div class="ux-modal-top">
+        <span class="ux-modal-label">Host rating</span>
+        <button class="ux-modal-close" onclick="closeUxModal('ratingPopup')"><i class="ti ti-x"></i></button>
+      </div>
+      <div class="review-list">
+        <div class="review-item"><strong>Amira · 5.0</strong><span>Maria met us at the gate and made it easy to join without explaining too much.</span></div>
+        <div class="review-item"><strong>Jon · 4.9</strong><span>The group was calm, the tasks were clear, and leaving early felt completely okay.</span></div>
+        <div class="review-item"><strong>Leah · 4.8</strong><span>Very gentle welcome. I could just listen first and still feel included.</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ux-modal-backdrop" id="mapPopup" onclick="if(event.target===this)closeUxModal('mapPopup')">
+    <div class="ux-modal-card">
+      <div class="ux-modal-top">
+        <span class="ux-modal-label">Route detail</span>
+        <button class="ux-modal-close" onclick="closeUxModal('mapPopup')"><i class="ti ti-x"></i></button>
+      </div>
+      <div class="expanded-map-box" id="expandedMapBox"></div>
+    </div>
+  </div>
+
+  <div class="ux-modal-backdrop" id="supportPopup" onclick="if(event.target===this)closeUxModal('supportPopup')">
+    <div class="ux-modal-card">
+      <div class="ux-modal-top">
+        <span class="ux-modal-label">Support setting</span>
+        <button class="ux-modal-close" onclick="closeUxModal('supportPopup')"><i class="ti ti-x"></i></button>
+      </div>
+      <div class="review-list">
+        <div class="support-option" onclick="this.classList.toggle('on')"><strong>Host intro</strong><span>Ask the link worker to arrange a soft introduction.</span></div>
+        <div class="support-option" onclick="this.classList.toggle('on')"><strong>Clear guidance</strong><span>Step-by-step arrival notes before the activity.</span></div>
+        <div class="support-option" onclick="this.classList.toggle('on')"><strong>Check-in after</strong><span>A short follow-up message after attending.</span></div>
+        <div class="support-option" onclick="this.classList.toggle('on')"><strong>Low pressure</strong><span>Prioritise quiet options with no forced conversation.</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ux-modal-backdrop" id="workerActivityPopup" onclick="if(event.target===this)closeUxModal('workerActivityPopup')">
+    <div class="ux-modal-card">
+      <div class="ux-modal-top">
+        <span class="ux-modal-label" id="workerActivityLabel">Past activity</span>
+        <button class="ux-modal-close" onclick="closeUxModal('workerActivityPopup')"><i class="ti ti-x"></i></button>
+      </div>
+      <div class="expanded-map-box" id="workerActivityImage"></div>
+      <div class="community-item" style="margin-top:12px;">
+        <strong id="workerActivityTitle">Calm first visit</strong>
+        <span id="workerActivityDesc">A previous activity Sam helped someone join with a quiet introduction.</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="ux-modal-backdrop" id="communityPopup" onclick="if(event.target===this)closeUxModal('communityPopup')">
+    <div class="ux-modal-card">
+      <div class="ux-modal-top">
+        <span class="ux-modal-label">Community</span>
+        <button class="ux-modal-close" onclick="closeUxModal('communityPopup')"><i class="ti ti-x"></i></button>
+      </div>
+      <div class="community-item">
+        <strong id="communityPopupTitle">Community</strong>
+        <span id="communityPopupText">A gentle local partner Sam can introduce.</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="chat-sheet-backdrop" id="workerChatSheet" onclick="if(event.target===this)closeWorkerChat()">
+    <div class="worker-chat-card">
+      <div class="ux-modal-top">
+        <span class="ux-modal-label">Message Sam</span>
+        <button class="ux-modal-close" onclick="closeWorkerChat()"><i class="ti ti-x"></i></button>
+      </div>
+      <div class="chat-thread" id="workerChatThread"></div>
+      <div class="chat-input-row">
+        <span id="workerChatInput"></span>
+        <button onclick="sendWorkerChat()"><i class="ti ti-arrow-up"></i></button>
+      </div>
+      <div class="ios-keyboard">
+        <div class="key-row"><span>q</span><span>w</span><span>e</span><span>r</span><span>t</span><span>y</span><span>u</span><span>i</span><span>o</span><span>p</span></div>
+        <div class="key-row"><span>a</span><span>s</span><span>d</span><span>f</span><span>g</span><span>h</span><span>j</span><span>k</span><span>l</span></div>
+        <div class="key-row"><span class="record-key-system">⇧</span><span>z</span><span>x</span><span>c</span><span>v</span><span>b</span><span>n</span><span>m</span><span class="record-key-system">⌫</span></div>
+        <div class="key-row record-space-row"><span class="record-key-system">123</span><span class="record-key-space"></span><span class="record-key-dot">.</span><span class="record-key-system record-key-return">→</span></div>
+        <div class="record-keyboard-footer"><span>☺</span><span><i class="ti ti-microphone"></i></span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="host-keyboard-backdrop" id="hostKeyboard">
+    <div class="host-keyboard-card">
+      <div class="ios-keyboard">
+        <div class="key-row"><span>q</span><span>w</span><span>e</span><span>r</span><span>t</span><span>y</span><span>u</span><span>i</span><span>o</span><span>p</span></div>
+        <div class="key-row"><span>a</span><span>s</span><span>d</span><span>f</span><span>g</span><span>h</span><span>j</span><span>k</span><span>l</span></div>
+        <div class="key-row"><span class="record-key-system">⇧</span><span>z</span><span>x</span><span>c</span><span>v</span><span>b</span><span>n</span><span>m</span><span class="record-key-system">⌫</span></div>
+        <div class="key-row record-space-row"><span class="record-key-system">123</span><span class="record-key-space"></span><span class="record-key-dot">.</span><span class="record-key-system record-key-return">→</span></div>
+        <div class="record-keyboard-footer"><span>☺</span><span><i class="ti ti-microphone"></i></span></div>
       </div>
     </div>
   </div>
 
 </div><!-- /phone -->
+</div><!-- /phone-frame -->
+
+<div class="phone-frame worker-phone-frame" id="workerPhoneFrame" aria-hidden="true">
+  <div class="phone worker-phone">
+    <div class="ios-status-bar" aria-hidden="true">
+      <div class="status-time">9:45</div>
+      <div class="status-island"></div>
+      <div class="status-icons">
+        <div class="cell-bars"><span></span><span></span><span></span><span></span></div>
+        <div class="wifi-icon"></div>
+        <div class="battery-icon"></div>
+      </div>
+    </div>
+    <div class="worker-algo" aria-hidden="true">
+      <div class="worker-algo-nav" id="workerAlgoNav"></div>
+      <div class="blob-anchor worker-algo-anchor">
+        <div class="radar-wrap worker-radar-wrap">
+          <div class="radar-ring r1"></div>
+          <div class="radar-ring r2"></div>
+          <div class="radar-ring r3"></div>
+          <div id="workerOrbitTags"></div>
+        </div>
+        <button class="big-btn worker-algo-btn" type="button" tabindex="-1">
+          <img src="linkoOlogo.png" alt="" class="blob-mark" style="display:block;opacity:1;"/>
+        </button>
+      </div>
+      <div class="connect-label worker-connect-label" id="workerCLabel">Connecting...</div>
+    </div>
+    <div class="worker-screen">
+      <div class="worker-head">
+        <div></div>
+        <div class="stack-title-group">
+          <div class="branch-title">WITH LINK WORKER</div>
+        </div>
+      </div>
+      <div class="worker-stack-blob">
+        <img src="linkoOlogo.png" alt="" class="blob-mark"/>
+      </div>
+      <div class="worker-panel" onclick="handleWorkerPanelClick(event)">
+        <div class="worker-cards stack-cards" id="workerCards"></div>
+        <div class="worker-detail" id="workerDetail"></div>
+      </div>
+    </div>
+  </div>
+</div>
+</div><!-- /phone-wrapper -->
 
 <script>
   const ACTIVITIES = [
@@ -2964,13 +6296,13 @@
     },
     {
       label: 'Outdoor reset',
-      summary: 'A gentle route outside with a slow pace and small group.',
-      reason: 'A calm option when movement and fresh air feel easier than sitting in a group.'
+      summary: 'a gentle route outside with a slow pace and small group.',
+      reason: 'a calm option when movement and fresh air feel easier than sitting in a group.'
     },
     {
       label: 'Practical support',
-      summary: 'Indoor, structured, and useful without needing to socialise much.',
-      reason: 'A task-based setting where the focus is practical help, not open-ended conversation.'
+      summary: 'indoor, structured, and useful without needing to socialise much.',
+      reason: 'a task-based setting where the focus is practical help, not open-ended conversation.'
     }
   ];
 
@@ -2979,7 +6311,7 @@
       hostName: 'Maria S.',
       hostRole: 'Community host · 42 sessions',
       hostInitial: 'M',
-      hostImage: '',
+      hostImage: 'Maria.jpg',
       intro: 'Maria keeps the first step calm: she meets people at the entrance, explains the flow quietly, and makes it easy to join without pressure.',
       trust: ['4.9 host rating', 'Linko verified'],
       summary: 'A small outdoor session with gentle garden tasks, a clear host, and no pressure to talk before you feel ready.',
@@ -3038,20 +6370,22 @@
   ];
 
   const SEQ_LABELS = {
-    s1: 'Onboarding',
+    s1: 'ONBOARDING',
     s2: 'ONE BUTTON TO CONNECT',
-    s4: 'THREE ACTIVITIES MATCHED',
-    s5: 'Activity confirm',
-    s6: 'Belonging',
-    s8: 'Feedback',
-    s9: 'Credits Earned, Now a Contributor',
-    s10: 'Create Activity',
+    s4: 'WITH LINKO',
+    s5: 'ACTIVITY CONFIRM',
+    s7: 'LINK WORKER MATCHED',
+    s6: 'BELONGING',
+    s8: 'FEEDBACK',
+    s9: 'PROGRESS TRACKING',
+    s10: 'BECOME A HOST',
   };
   function updateSeqLabel(text) {
     const lbl = document.getElementById('seqLabel');
     if (!lbl) return;
+    const labelText = String(text || '').toUpperCase();
     lbl.style.opacity = '0';
-    setTimeout(() => { lbl.textContent = text; lbl.style.opacity = '1'; }, 300);
+    setTimeout(() => { lbl.textContent = labelText; lbl.style.opacity = '1'; }, 300);
   }
   function goTo(id) {
     const target = document.getElementById(id);
@@ -3094,6 +6428,354 @@
     showMapOverlay();
   }
 
+  let workerFlowActive = false;
+  let currentWorkerIdx = 0;
+  let selectedWorkerIdx = null;
+  let workerSupportExpanded = false;
+  const LINK_WORKERS = [
+    {
+      name: 'Mina P.',
+      role: 'Low-pressure introductions',
+      status: 'Best fit for a gentle first step',
+      summary: 'Mina can make a quiet introduction, confirm access needs, and help Aaliyah choose the easiest activity to start with.',
+      initial: 'M',
+      image: '4f88ab9fe8a6fbdec941834b67b51146.jpg',
+      detailImage: '4f88ab9fe8a6fbdec941834b67b51146.jpg',
+      tiles: [
+        '46b9e47e37d7e9c8b3d050aefe710c3d.jpg',
+        '3adf52b7c69cf102fde2193c36cd8c63.jpg',
+        '18e603f271f36035ad17e27c7f934256.jpg',
+        '5036280288d827501ca066374f615dc9.jpg',
+        '7704be727c97914c68213975721b96a0.jpg',
+        '908b69b50782b93b3bbc7a5a701ed83f.jpg'
+      ]
+    },
+    {
+      name: 'Sam R.',
+      role: 'Community navigator',
+      status: 'Knows nearby VCSE partners',
+      summary: 'Sam is strong at matching people to nearby community groups and keeping the next step small and clear.',
+      initial: 'S',
+      image: 'Sam.jpg',
+      detailImage: 'Sam2.jpg',
+      tiles: [
+        '6e2131c72c1e64e481c35917fd2792fa.jpg',
+        '83bc603fc61307b898ea2d2cd221d4ec.jpg',
+        'ca878983b8c17b6708e7246dd4788d2f.jpg',
+        'e59bac7d0f288a06233ef8e9247bd481.jpg',
+        '99d9418a7bd661a52e931759acc085ce.jpg',
+        '1e26fe477bc2f464ffb54a6f601c6742.jpg'
+      ]
+    },
+    {
+      name: 'Theo L.',
+      role: 'Creative wellbeing support',
+      status: 'Good with creative routes in',
+      summary: 'Theo focuses on side-by-side activities and calm introductions when direct conversation feels like too much.',
+      initial: 'T',
+      image: '43e76d8f888385eb9abfdf004d876eb2.jpg',
+      detailImage: '43e76d8f888385eb9abfdf004d876eb2.jpg',
+      tiles: [
+        'ea2800a77c5429392331b1436350183f.jpg',
+        '1a451db539202598982895fee95ace3f.jpg',
+        'e0d8beb34f484568c85c4201963bf47c.jpg',
+        '8c286d9e21ca52e6044f67c5a5cd953e.jpg',
+        'bbb3580de26fdfa1799b4e39971a105d.jpg',
+        'b3312201ddf24229796c4e4d9748a015.jpg'
+      ]
+    }
+  ];
+
+  function renderWorkerCards() {
+    const cont = document.getElementById('workerCards');
+    if (!cont) return;
+    cont.className = 'worker-cards stack-cards';
+    if (selectedWorkerIdx !== null) {
+      cont.classList.add('is-expanded', `expanded-slot-${selectedWorkerIdx}`);
+    }
+    if (workerSupportExpanded) {
+      cont.classList.add('is-expanded', 'prefs-expanded');
+    }
+    const supportCard = `
+      <div class="worker-card stack-card preference-card ${workerSupportExpanded ? 'expanded' : ''}" role="button" tabindex="0" onclick="event.stopPropagation();toggleWorkerSupportDetail()">
+        <div class="preference-title">Support setting</div>
+        <strong>Guided first step</strong>
+        <div class="preference-overview">
+          <div>Role: Link worker</div>
+          <div>Support: Host intro</div>
+          <div>Style: Clear guidance</div>
+          <div>Follow-up: Optional</div>
+        </div>
+        <div class="preference-tags">
+          <span>Host intro</span>
+          <span>Clear guidance</span>
+          <span>Low pressure</span>
+        </div>
+        <i class="ti ti-adjustments-horizontal preference-edit"></i>
+        <div class="worker-support-panel" onclick="event.stopPropagation()">
+          <div class="worker-support-group">
+            <small>Support style</small>
+            <button class="support-option on" onclick="event.stopPropagation();this.classList.toggle('on')">Host intro</button>
+            <button class="support-option" onclick="event.stopPropagation();this.classList.toggle('on')">Check-in after</button>
+            <button class="support-option on" onclick="event.stopPropagation();this.classList.toggle('on')">Clear guidance</button>
+          </div>
+          <div class="worker-support-group">
+            <small>Comfort</small>
+            <button class="support-option on" onclick="event.stopPropagation();this.classList.toggle('on')">Low pressure</button>
+            <button class="support-option" onclick="event.stopPropagation();this.classList.toggle('on')">Step-free route</button>
+            <button class="support-option" onclick="event.stopPropagation();this.classList.toggle('on')">Quiet arrival</button>
+          </div>
+          <button class="worker-support-done" onclick="event.stopPropagation();setWorkerSupportDetail(false)">Done</button>
+        </div>
+      </div>
+    `;
+    const workerCards = LINK_WORKERS.map((worker, index) => `
+      <div class="worker-card stack-card rec-card-shell ${selectedWorkerIdx === index ? 'expanded' : ''}" data-slot="${index}" role="button" tabindex="0" onclick="event.stopPropagation();openWorkerDetail(${index})">
+        <span class="stack-label">${index === 0 ? 'Closest support' : index === 1 ? 'Local navigator' : 'Creative route'}</span>
+        <div class="worker-card-avatar">${worker.image ? `<img src="${worker.image}" alt="${worker.name}">` : worker.initial}</div>
+        <h3>${worker.name}</h3>
+        <p class="stack-summary">${worker.role}</p>
+        <div class="summary-meta">
+          <span><i class="ti ti-user-heart"></i>${worker.status}</span>
+          <span><i class="ti ti-message-circle"></i>Can make the first introduction</span>
+          <span><i class="ti ti-route"></i>Then joins the same activity flow</span>
+        </div>
+        <p class="stack-reason">${worker.summary}</p>
+        <div class="worker-memory-grid">
+          ${(worker.tiles || []).map((src, tileIndex) => `
+            <button class="worker-memory-tile" onclick="event.stopPropagation();openWorkerActivityPopup(${index},${tileIndex})">
+              <img src="${src}" alt="${worker.name} activity ${tileIndex + 1}" onerror="this.parentElement.innerHTML='<span>Activity ${tileIndex + 1}</span>'">
+            </button>
+          `).join('')}
+        </div>
+        <div class="card-img worker-detail-media" style="background:linear-gradient(135deg,rgba(0,27,94,0.08),rgba(240,74,23,0.14));">
+          ${worker.detailImage
+            ? `<img src="${worker.detailImage}" alt="${worker.name}">`
+            : `<div class="worker-card-avatar worker-card-photo" style="width:118px;height:118px;border-radius:34px;font-size:34px;">${worker.image ? `<img src="${worker.image}" alt="${worker.name}">` : worker.initial}</div>`}
+        </div>
+        <div class="card-actions">
+          <button class="btn-ghost card-btn-sm" onclick="event.stopPropagation();closeWorkerDetail()">Not now</button>
+          <button class="btn-ghost card-btn-sm" onclick="event.stopPropagation();replaceWorker()">Another</button>
+          <button class="btn-primary card-btn-join" onclick="event.stopPropagation();joinWorker()">Connect</button>
+        </div>
+      </div>
+    `).join('');
+    cont.innerHTML = supportCard + workerCards;
+  }
+
+  function enterWorkerMode() {
+    workerFlowActive = false;
+    selectedWorkerIdx = null;
+    const wrapper = document.querySelector('.phone-wrapper');
+    const workerFrame = document.getElementById('workerPhoneFrame');
+    wrapper?.classList.remove('worker-mode', 'worker-connecting', 'branch-labels-on');
+    workerFrame?.setAttribute('aria-hidden', 'true');
+    updateSeqLabel('WITH LINKO');
+    return;
+    workerFlowActive = true;
+    selectedWorkerIdx = null;
+    renderWorkerCards();
+    syncWorkerAlgorithmNav();
+    wrapper?.classList.add('worker-mode', 'worker-connecting');
+    wrapper?.classList.remove('branch-labels-on');
+    workerFrame?.setAttribute('aria-hidden', 'false');
+  }
+
+  function syncWorkerAlgorithmNav() {
+    const source = document.querySelector('#s2 .s2-nav');
+    const target = document.getElementById('workerAlgoNav');
+    if (!source || !target || target.children.length) return;
+    target.innerHTML = source.innerHTML;
+    target.className = source.className + ' worker-cloned-nav';
+  }
+
+  function exitWorkerMode({ stopLines = true } = {}) {
+    const wrapper = document.querySelector('.phone-wrapper');
+    const workerFrame = document.getElementById('workerPhoneFrame');
+    wrapper?.classList.remove('worker-mode');
+    wrapper?.classList.remove('worker-connecting');
+    wrapper?.classList.remove('branch-labels-on');
+    workerFrame?.setAttribute('aria-hidden', 'true');
+    workerFlowActive = false;
+    closeWorkerDetail();
+    if (stopLines) stopAlgoViz();
+  }
+
+  function proceedToSharedConfirm(idx = visibleStackIdxs[0] || 0) {
+    currentMapIdx = idx;
+    currentAct = idx;
+    window.clearTimeout(window.__connectOverlayTimer);
+    exitWorkerMode({ stopLines: true });
+    closeMapOverlay(false);
+    setTimeout(() => openDetail(idx), 620);
+  }
+
+  function closeWorkerDetail() {
+    const cont = document.getElementById('workerCards');
+    const expanded = cont?.querySelector('.rec-card-shell.expanded, .preference-card.expanded');
+    const firstRect = expanded?.getBoundingClientRect();
+    selectedWorkerIdx = null;
+    workerSupportExpanded = false;
+    if (cont && expanded && firstRect) {
+      cont.className = 'worker-cards stack-cards';
+      cont.querySelector('.preference-card')?.classList.remove('expanded', 'dimmed');
+      cont.querySelectorAll('.worker-card, .rec-card-shell').forEach(card => {
+        card.classList.remove('expanded', 'dimmed');
+      });
+      animateCardMorph(expanded, firstRect);
+      setTimeout(() => {
+        if (selectedWorkerIdx === null && !workerSupportExpanded) renderWorkerCards();
+      }, 460);
+    } else {
+      renderWorkerCards();
+    }
+    const detail = document.getElementById('workerDetail');
+    if (!detail) return;
+    detail.classList.remove('open');
+    detail.innerHTML = '';
+  }
+
+  function setWorkerSupportDetail(open = true) {
+    selectedWorkerIdx = null;
+    workerSupportExpanded = open;
+    renderWorkerCards();
+  }
+
+  function toggleWorkerSupportDetail() {
+    setWorkerSupportDetail(!workerSupportExpanded);
+  }
+
+  function openSupportPopup() {
+    document.getElementById('supportPopup')?.classList.add('open');
+  }
+
+  function closeUxModal(id) {
+    document.getElementById(id)?.classList.remove('open');
+  }
+
+  function ensureWorkerPopup() {
+    const workerPhone = document.querySelector('.worker-phone');
+    if (!workerPhone) return null;
+    let popup = workerPhone.querySelector('#workerActivityPopupWorker');
+    if (popup) return popup;
+    popup = document.createElement('div');
+    popup.className = 'ux-modal-backdrop';
+    popup.id = 'workerActivityPopupWorker';
+    popup.onclick = (event) => {
+      if (event.target === popup) popup.classList.remove('open');
+    };
+    popup.innerHTML = `
+      <div class="ux-modal-card">
+        <div class="ux-modal-top">
+          <span class="ux-modal-label" data-role="label">Past activity</span>
+          <button class="ux-modal-close" onclick="this.closest('.ux-modal-backdrop').classList.remove('open')"><i class="ti ti-x"></i></button>
+        </div>
+        <div class="expanded-map-box" data-role="image"></div>
+        <div class="community-item" style="margin-top:12px;">
+          <strong data-role="title">Calm first visit</strong>
+          <span data-role="desc">A previous activity supported by this link worker.</span>
+        </div>
+      </div>
+    `;
+    workerPhone.appendChild(popup);
+    return popup;
+  }
+
+  function openWorkerActivityPopup(workerIndex, tileIndex) {
+    const worker = LINK_WORKERS[workerIndex] || LINK_WORKERS[1];
+    const src = worker.tiles?.[tileIndex] || worker.detailImage || worker.image || '';
+    const titles = [
+      'Quiet arrival support',
+      'Neighbourhood garden intro',
+      'Coffee table check-in',
+      'Creative group bridge',
+      'Access needs confirmed',
+      'Follow-up after attending'
+    ];
+    const popup = document.body.classList.contains('pv-embed-worker')
+      ? ensureWorkerPopup()
+      : document.getElementById('workerActivityPopup');
+    if (!popup) return;
+    const imageBox = popup.querySelector('[data-role="image"], #workerActivityImage');
+    const titleEl = popup.querySelector('[data-role="title"], #workerActivityTitle');
+    const descEl = popup.querySelector('[data-role="desc"], #workerActivityDesc');
+    const labelEl = popup.querySelector('[data-role="label"], #workerActivityLabel');
+    if (labelEl) labelEl.textContent = `${worker.name} · Past activity`;
+    if (titleEl) titleEl.textContent = titles[tileIndex] || 'Supported first step';
+    if (descEl) descEl.textContent = `${worker.name} helped someone explore this route with a clear first introduction and optional follow-up.`;
+    if (imageBox) {
+      imageBox.innerHTML = src
+        ? `<img src="${src}" alt="${worker.name} past activity" style="width:100%;height:232px;object-fit:cover;display:block;" onerror="this.parentElement.innerHTML='<div style=&quot;display:grid;place-items:center;height:232px;color:#001b5e;font-weight:900;&quot;>Activity image</div>'">`
+        : `<div style="display:grid;place-items:center;height:232px;color:#001b5e;font-weight:900;">Activity image</div>`;
+    }
+    popup.classList.add('open');
+  }
+
+  function openWorkerDetail(index) {
+    currentWorkerIdx = index;
+    workerSupportExpanded = false;
+    const cont = document.getElementById('workerCards');
+    const card = cont?.querySelector(`.rec-card-shell[data-slot="${index}"]`);
+    const firstRect = card?.getBoundingClientRect();
+    selectedWorkerIdx = index;
+    if (!cont || !card || !firstRect) {
+      renderWorkerCards();
+      return;
+    }
+    cont.className = `worker-cards stack-cards is-expanded expanded-slot-${index}`;
+    cont.querySelector('.preference-card')?.classList.add('dimmed');
+    cont.querySelectorAll('.rec-card-shell').forEach(other => {
+      if (other === card) {
+        other.classList.add('expanded');
+        other.classList.remove('dimmed');
+      } else {
+        other.classList.add('dimmed');
+        other.classList.remove('expanded');
+      }
+    });
+    animateCardMorph(card, firstRect);
+  }
+
+  function setWorkerCardState() {
+    const cont = document.getElementById('workerCards');
+    if (!cont) return;
+    cont.classList.remove('is-expanded', 'prefs-expanded', 'expanded-slot-0', 'expanded-slot-1', 'expanded-slot-2');
+    cont.querySelector('.preference-card')?.classList.remove('expanded');
+    cont.querySelectorAll('.rec-card-shell').forEach(card => card.classList.remove('expanded'));
+    if (selectedWorkerIdx === null) return;
+    cont.classList.add('is-expanded', `expanded-slot-${selectedWorkerIdx}`);
+    cont.querySelector(`.rec-card-shell[data-slot="${selectedWorkerIdx}"]`)?.classList.add('expanded');
+  }
+
+  function handleWorkerPanelClick(event) {
+    if (selectedWorkerIdx === null) return;
+    if (event.target.closest('.rec-card-shell.expanded')) return;
+    closeWorkerDetail();
+  }
+
+  function replaceWorker() {
+    const next = (currentWorkerIdx + 1) % LINK_WORKERS.length;
+    openWorkerDetail(next);
+  }
+
+  function joinWorker() {
+    openLinkWorkerMatched(currentWorkerIdx);
+  }
+
+  function openLinkWorkerMatched(index = currentWorkerIdx) {
+    const worker = LINK_WORKERS[index] || LINK_WORKERS[1];
+    window.clearTimeout(window.__connectOverlayTimer);
+    exitWorkerMode({ stopLines: true });
+    closeMapOverlay(false);
+    document.getElementById('matchedWorkerAvatar').innerHTML = worker.image
+      ? `<img src="${worker.image}" alt="${worker.name}">`
+      : worker.initial;
+    document.getElementById('matchedWorkerName').textContent = worker.name;
+    document.getElementById('matchedWorkerRole').textContent = worker.role;
+    document.getElementById('matchedWorkerIntro').textContent = worker.summary;
+    setTimeout(() => goTo('s7'), 520);
+  }
+
   function onBigBtn() {
     const btn    = document.getElementById('bigBtn');
     const label  = document.getElementById('btnLabel');
@@ -3105,7 +6787,11 @@
     const prefsPanel = document.getElementById('oneButtonPreferences');
 
     btn.onclick = null;
-    triggerAlgoViz();
+    exitWorkerMode({ stopLines: false });
+    setTimeout(() => triggerAlgoViz('connect'), 160);
+    setTimeout(() => {
+      if (workerFlowActive) showMapOverlay();
+    }, 5400);
 
     // Phase 1 (0–600ms): blob shrinks in place
     btn.style.transition = 'width 0.6s cubic-bezier(0.4,0,0.2,1), height 0.6s, border-radius 0.6s';
@@ -3162,33 +6848,46 @@
       { label: '📋 Social Prescribing', angle: 300 },
     ];
     const labels  = ['Connecting...','Scanning nearby...','Matching preferences...','Found 3 activities!'];
-    const lEl  = document.getElementById('cLabel');
-    const cont = document.getElementById('orbitTags');
-    cont.innerHTML = '';
+    const labelEls = [
+      document.getElementById('cLabel'),
+      document.getElementById('workerCLabel')
+    ].filter(Boolean);
+    const containers = [
+      document.getElementById('orbitTags'),
+      document.getElementById('workerOrbitTags')
+    ].filter(Boolean);
+    containers.forEach(cont => { cont.innerHTML = ''; });
 
     tagData.forEach((t, i) => {
       setTimeout(() => {
-        const el  = document.createElement('span');
-        el.className = 'orbit-tag';
-        el.textContent = t.label;
-
         const rad = (t.angle - 90) * Math.PI / 180;
-        el.style.left = (CENTER + Math.cos(rad) * RADIUS) + 'px';
-        el.style.top  = (CENTER + Math.sin(rad) * RADIUS) + 'px';
-        cont.appendChild(el);
-
-        requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('visible')));
+        containers.forEach(cont => {
+          const el  = document.createElement('span');
+          el.className = 'orbit-tag';
+          el.textContent = t.label;
+          el.style.left = (CENTER + Math.cos(rad) * RADIUS) + 'px';
+          el.style.top  = (CENTER + Math.sin(rad) * RADIUS) + 'px';
+          cont.appendChild(el);
+          requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('visible')));
+        });
       }, i * 450 + 400);
     });
 
     labels.forEach((l, i) => {
-      setTimeout(() => { lEl.textContent = l; }, i * 650 + 200);
+      setTimeout(() => { labelEls.forEach(el => { el.textContent = l; }); }, i * 650 + 200);
     });
 
-    setTimeout(() => { showMapOverlay(); setTimeout(resetS2, 900); }, 5000);
+    window.clearTimeout(window.__connectOverlayTimer);
+    window.__connectOverlayTimer = setTimeout(() => {
+      if (!workerFlowActive) {
+        showMapOverlay();
+        setTimeout(resetS2, 900);
+      }
+    }, 5000);
   }
 
   function resetS2() {
+    window.clearTimeout(window.__connectOverlayTimer);
     const btn    = document.getElementById('bigBtn');
     const label  = document.getElementById('btnLabel');
     const icon   = document.getElementById('btnIcon');
@@ -3196,6 +6895,8 @@
     const cLabel = document.getElementById('cLabel');
     const radar  = document.getElementById('radarWrap');
     const cont   = document.getElementById('orbitTags');
+    const workerCont = document.getElementById('workerOrbitTags');
+    const workerLabel = document.getElementById('workerCLabel');
     const intro  = document.querySelector('.s2-intro');
     const prefsPanel = document.getElementById('oneButtonPreferences');
 
@@ -3222,6 +6923,8 @@
     cLabel.style.opacity   = '0';
     cLabel.textContent     = 'Connecting...';
     cont.innerHTML         = '';
+    if (workerCont) workerCont.innerHTML = '';
+    if (workerLabel) workerLabel.textContent = 'Connecting...';
     ['rr1','rr2','rr3'].forEach(id => document.getElementById(id).style.display = 'none');
     btn.onclick = onBigBtn;
   }
@@ -3240,9 +6943,9 @@
     'linear-gradient(135deg,#e3f2fd,#90caf9)',
   ];
   const PREFERENCE_GROUPS = [
-    { label: 'Pressure', options: ['Low', 'Medium', 'Social'], active: 0 },
-    { label: 'Distance', options: ['20 min', '40 min', 'Any'], active: 0 },
-    { label: 'Setting', options: ['Indoor', 'Outdoor', 'Either'], active: 0 },
+    { label: 'Path', options: ['Activity Match', 'Link Worker Support'], active: 0 },
+    { label: 'Distance', options: ['Nearby', '40 min', 'Flexible'], active: 0 },
+    { label: 'Setting', options: ['Indoor', 'Outdoor', 'Either'], active: 2 },
     { label: 'Format', options: ['1:1', 'Small group', 'Open group'], active: 1 },
   ];
   const DETAIL_PREFERENCE_GROUPS = [
@@ -3378,7 +7081,15 @@
   }
 
   function showMapOverlay() {
-    updateSeqLabel('THREE ACTIVITIES MATCHED');
+    const wrapper = document.querySelector('.phone-wrapper');
+    wrapper?.classList.remove('worker-connecting');
+    if (workerFlowActive) {
+      wrapper?.classList.add('branch-labels-on');
+      updateSeqLabel('');
+    } else {
+      wrapper?.classList.remove('branch-labels-on');
+      updateSeqLabel('WITH LINKO');
+    }
     const overlay = document.getElementById('s4-overlay');
     selectedStackIdx = null;
     isPreferenceExpanded = false;
@@ -3405,6 +7116,7 @@
 
   function closeMapOverlay(resetLabel = true) {
     const overlay = document.getElementById('s4-overlay');
+    document.querySelector('.phone-wrapper')?.classList.remove('branch-labels-on');
     overlay.classList.remove('visible', 'entering', 'stack-expanded');
     overlay.onclick = null;
     closeMapDetail();
@@ -3416,6 +7128,7 @@
   }
 
   function openMapDetail(idx) {
+    document.querySelector('.phone-wrapper')?.classList.remove('branch-labels-on');
     updateSeqLabel('Activity Selected');
     currentMapIdx = idx;
     selectedStackIdx = idx;
@@ -3429,6 +7142,7 @@
       return;
     }
     const firstRect = card.getBoundingClientRect();
+    card.classList.add('is-morphing');
     cont.className = 'stack-cards is-expanded expanded-slot-' + slot;
     card.classList.add('expanded');
     document.querySelectorAll('.rec-card-shell').forEach(other => {
@@ -3450,6 +7164,7 @@
       return;
     }
     const firstRect = prefs.getBoundingClientRect();
+    prefs.classList.add('is-morphing');
     cont.className = 'stack-cards is-expanded prefs-expanded';
     prefs.classList.add('expanded');
     document.querySelectorAll('.rec-card-shell').forEach(card => card.classList.add('dimmed'));
@@ -3459,12 +7174,20 @@
   function collapseStack() {
     const cont = document.getElementById('stackCards');
     const el = document.querySelector('.rec-card-shell.expanded, .preference-card.expanded');
-    if (!cont || !el) return;
+    if (!cont || !el) {
+      closeMapDetail();
+      renderStackCards();
+      return;
+    }
     const firstRect = el.getBoundingClientRect();
+    el.classList.add('is-morphing');
     selectedStackIdx = null;
     isPreferenceExpanded = false;
     document.getElementById('s4-overlay')?.classList.remove('stack-expanded');
-    updateSeqLabel('THREE ACTIVITIES MATCHED');
+    const wrapper = document.querySelector('.phone-wrapper');
+    if (workerFlowActive) wrapper?.classList.add('branch-labels-on');
+    else wrapper?.classList.remove('branch-labels-on');
+    updateSeqLabel(workerFlowActive ? '' : 'WITH LINKO');
     cont.className = 'stack-cards';
     el.classList.remove('expanded');
     document.querySelectorAll('.rec-card-shell.dimmed').forEach(c => c.classList.remove('dimmed'));
@@ -3473,7 +7196,7 @@
     animateCardMorph(el, firstRect);
     setTimeout(() => {
       renderStackCards();
-    }, 450);
+    }, 820);
   }
 
   function closeMapDetail() {
@@ -3481,26 +7204,36 @@
     isPreferenceExpanded = false;
     document.getElementById('s4-overlay')?.classList.remove('stack-expanded');
     const cont = document.getElementById('stackCards');
-    if (cont) cont.className = 'stack-cards';
+    if (cont) {
+      cont.className = 'stack-cards';
+      cont.querySelectorAll('.stack-card').forEach(card => {
+        card.classList.remove('expanded', 'dimmed', 'removing');
+      });
+    }
   }
 
   function animateCardMorph(card, firstRect) {
-    if (!card || !firstRect || !card.animate) return;
+    if (!card || !firstRect || !card.animate) {
+      card?.classList.remove('is-morphing');
+      return;
+    }
     const lastRect = card.getBoundingClientRect();
     const scaleX = firstRect.width / Math.max(lastRect.width, 1);
     const scaleY = firstRect.height / Math.max(lastRect.height, 1);
     const dx = firstRect.left - lastRect.left;
     const dy = firstRect.top - lastRect.top;
-    card.animate(
+    const morph = card.animate(
       [
         { transform: `translate(${dx}px, ${dy}px) scale(${scaleX}, ${scaleY})` },
         { transform: 'translate(0, 0) scale(1, 1)' }
       ],
       {
-        duration: 520,
-        easing: 'cubic-bezier(0.22, 1, 0.36, 1)'
+        duration: 780,
+        easing: 'cubic-bezier(0.16, 1, 0.3, 1)'
       }
     );
+    morph.onfinish = () => card.classList.remove('is-morphing');
+    morph.oncancel = () => card.classList.remove('is-morphing');
   }
 
   function goToDetailFull() {
@@ -3509,8 +7242,16 @@
       return;
     }
     openDetail(currentMapIdx);
-    closeMapOverlay(false);
-    goTo('s5');
+    const overlay = document.getElementById('s4-overlay');
+    document.querySelector('.phone-wrapper')?.classList.remove('branch-labels-on');
+    if (!overlay) return;
+    overlay.classList.remove('visible', 'entering', 'stack-expanded');
+    overlay.onclick = null;
+    window.clearTimeout(window.__closeMapOverlayTimer);
+    window.__closeMapOverlayTimer = window.setTimeout(() => {
+      closeMapDetail();
+      overlay.style.display = 'none';
+    }, 720);
   }
 
   function joinStackOption(event, idx) {
@@ -3518,6 +7259,10 @@
     currentMapIdx = idx;
     selectedStackIdx = idx;
     document.getElementById('stackCards').onclick = null;
+    if (workerFlowActive) {
+      proceedToSharedConfirm(idx);
+      return;
+    }
     goToDetailFull();
   }
 
@@ -3542,7 +7287,9 @@
       }
 
       selectedStackIdx = null;
+      isPreferenceExpanded = false;
       currentMapIdx = visibleStackIdxs[0] || 0;
+      document.getElementById('s4-overlay')?.classList.remove('stack-expanded');
       renderStackCards();
     }, 260);
   }
@@ -3622,6 +7369,12 @@
     `;
   }
 
+  function renderBelongingVideo() {
+    return `
+      <video class="belonging-video" src="Belonging.mp4" autoplay muted loop playsinline></video>
+    `;
+  }
+
   function openDetail(idx) {
     currentAct = idx;
     const a = ACTIVITIES[idx];
@@ -3635,7 +7388,7 @@
     document.getElementById('hostRole').textContent = detail.hostRole;
     document.getElementById('hostIntroText').textContent = detail.intro;
     document.getElementById('hostTrustRow').innerHTML = detail.trust.map((item, i) => `
-      <div class="host-trust">
+      <div class="host-trust ${i === 0 ? 'rating-clickable' : ''}" ${i === 0 ? 'onclick="openRatingPopup()"' : ''}>
         <i class="ti ${i === 0 ? 'ti-star-filled' : 'ti-shield-check'}"></i>${item}
       </div>`).join('');
     document.getElementById('detSummary').textContent = detail.summary;
@@ -3651,6 +7404,8 @@
     document.getElementById('detRouteNote').textContent = detail.route;
     document.getElementById('detDistance').textContent = placeInfo.distance;
     document.getElementById('detMap').innerHTML = renderJoinMap(a, detail, placeInfo);
+    document.getElementById('detMap').classList.add('map-clickable');
+    document.getElementById('detMap').onclick = openMapPopup;
     document.getElementById('detMapLegend').innerHTML = `
       <span><i class="ti ti-current-location"></i> You</span>
       <span><i class="ti ti-route"></i> ${detail.meetPoint}</span>
@@ -3696,6 +7451,67 @@
     `;
   }
 
+  function openRatingPopup() {
+    document.getElementById('ratingPopup')?.classList.add('open');
+  }
+
+  function openMapPopup() {
+    const target = document.getElementById('expandedMapBox');
+    const source = document.getElementById('detMap') || document.getElementById('bookingMap');
+    if (target && source) target.innerHTML = source.innerHTML;
+    document.getElementById('mapPopup')?.classList.add('open');
+  }
+
+  function openActivityContactSheet() {
+    openWorkerChat('Maria S.');
+  }
+
+  function openCommunityPopup(title, text) {
+    document.getElementById('communityPopupTitle').textContent = title;
+    document.getElementById('communityPopupText').textContent = text;
+    document.getElementById('communityPopup')?.classList.add('open');
+  }
+
+  function openWorkerChat(name = 'Sam R.') {
+    const sheet = document.getElementById('workerChatSheet');
+    const input = document.getElementById('workerChatInput');
+    const thread = document.getElementById('workerChatThread');
+    if (!sheet || !input || !thread) return;
+    sheet.querySelector('.ux-modal-label').textContent = `Message ${name.replace(/\\s.*/, '')}`;
+    input.textContent = '';
+    thread.innerHTML = '';
+    sheet.classList.add('open');
+  }
+
+  function closeWorkerChat() {
+    document.getElementById('workerChatSheet')?.classList.remove('open');
+  }
+
+  function typeWorkerMessage(text = "I'm looking to join some community activities.", speed = 34) {
+    const input = document.getElementById('workerChatInput');
+    if (!input) return Promise.resolve();
+    input.textContent = '';
+    return new Promise(resolve => {
+      let i = 0;
+      window.clearInterval(window.__workerTypingTimer);
+      window.__workerTypingTimer = window.setInterval(() => {
+        input.textContent = text.slice(0, i++);
+        if (i > text.length + 1) {
+          window.clearInterval(window.__workerTypingTimer);
+          resolve();
+        }
+      }, speed);
+    });
+  }
+
+  function sendWorkerChat() {
+    const input = document.getElementById('workerChatInput');
+    const thread = document.getElementById('workerChatThread');
+    if (!input || !thread || !input.textContent.trim()) return;
+    thread.insertAdjacentHTML('beforeend', `<div class="chat-bubble">${input.textContent.trim()}</div>`);
+    input.textContent = '';
+  }
+
   function setButtonEnabled(button, enabled) {
     if (!button) return;
     button.disabled = !enabled;
@@ -3704,7 +7520,10 @@
 
   function stopAlgoViz() {
     const overlay = document.getElementById('algo-overlay');
-    if (overlay) overlay.style.opacity = '0';
+    if (overlay) {
+      overlay.style.opacity = '0';
+      clearSvgAlgoViz();
+    }
     if (algoSketch) {
       algoSketch.remove();
       algoSketch = null;
@@ -3740,7 +7559,7 @@
     window.__creditStampTimer2 = window.setTimeout(() => {
       slots[9]?.classList.add('filled');
       setButtonEnabled(createBtn, true);
-    }, 1040);
+    }, 2400);
   }
 
   function resetCreatePage() {
@@ -3749,8 +7568,56 @@
     if (!screen) return;
     screen.classList.remove('publishing', 'published');
     document.querySelector('.publish-orb')?.classList.remove('is-finishing');
+    prepareHostIdeaEmpty();
     const lbl = document.getElementById('seqLabel');
     if (lbl) lbl.style.opacity = '1';
+  }
+
+  function prepareHostIdeaEmpty() {
+    const title = document.getElementById('hostIdeaTitle');
+    const desc = document.getElementById('hostIdeaDescription');
+    const keyboard = document.getElementById('hostKeyboard');
+    window.clearInterval(window.__hostTypingTimer);
+    if (title) {
+      title.textContent = 'Tap to add an activity idea';
+      title.classList.add('empty');
+      title.classList.remove('create-typing-cursor');
+    }
+    if (desc) desc.textContent = 'Add a short description people will see before deciding to join.';
+    keyboard?.classList.remove('open');
+  }
+
+  function openHostIdeaEditor() {
+    typeHostIdea();
+  }
+
+  function typeHostIdea() {
+    const title = document.getElementById('hostIdeaTitle');
+    const desc = document.getElementById('hostIdeaDescription');
+    const keyboard = document.getElementById('hostKeyboard');
+    if (!title || !desc) return Promise.resolve();
+    const full = 'Quiet tea and sketch table\nA simple hosted table where people can arrive softly, draw, chat a little, or just sit nearby.';
+    title.textContent = '';
+    desc.textContent = '';
+    title.classList.remove('empty');
+    title.classList.add('create-typing-cursor');
+    keyboard?.classList.add('open');
+    return new Promise(resolve => {
+      let i = 0;
+      window.clearInterval(window.__hostTypingTimer);
+      window.__hostTypingTimer = window.setInterval(() => {
+        const current = full.slice(0, i++);
+        const parts = current.split('\n');
+        title.textContent = parts[0] || '';
+        desc.textContent = parts[1] || '';
+        if (i > full.length + 1) {
+          window.clearInterval(window.__hostTypingTimer);
+          title.classList.remove('create-typing-cursor');
+          setTimeout(() => keyboard?.classList.remove('open'), 500);
+          resolve();
+        }
+      }, 48);
+    });
   }
 
   function completeActivity() {
@@ -3773,7 +7640,7 @@
     screen.classList.remove('published');
     document.querySelector('.publish-orb')?.classList.remove('is-finishing');
     screen.classList.add('publishing');
-    updateSeqLabel('Host a gentle Linko');
+    updateSeqLabel('Start hosting');
   }
 
   function finishPublishedLinko() {
@@ -3792,9 +7659,13 @@
   // 스플래시: 페이드인 → 유지 → 페이드아웃 → 전환
   const logo = document.getElementById('splashLogo');
   logo.src = 'LinkoLogo.png';
-  setTimeout(() => { logo.style.opacity = '1'; }, 100);
-  setTimeout(() => { logo.style.opacity = '0'; }, 2400);
-  setTimeout(() => { goTo('s2'); }, 3200);
+  const bootParams = new URLSearchParams(window.location.search);
+  const skipBootSplash = bootParams.get('embed') || bootParams.get('loopshowcase') === '1' || bootParams.get('panavision') === '1';
+  if (!skipBootSplash) {
+    setTimeout(() => { logo.style.opacity = '1'; }, 100);
+    setTimeout(() => { logo.style.opacity = '0'; }, 2400);
+    setTimeout(() => { goTo('s2'); updateSeqLabel('ONE BUTTON TO CONNECT'); }, 3200);
+  }
 
 
   // ═══════════════════════════════════════════════════════
@@ -3807,19 +7678,28 @@
   }
 
   const ALGO_MODES = {
+    workerSplit: {
+      split: true,
+      left: ['NHS', 'GP', 'LOTI'],
+      right: ['User Data', 'VCSE', 'Local Community'],
+      color: [237, 75, 0],
+      core: [255, 182, 92],
+      count: 150,
+      y: [0.25, 0.5, 0.75]
+    },
     connect: {
       left: ['NHS', 'GP', 'LOTI'],
       right: ['User Data', 'VCSE', 'Local Community'],
-      color: [240, 74, 23],
-      core: [255, 197, 142],
+      color: [237, 75, 0],
+      core: [255, 182, 92],
       count: 190,
       y: [0.25, 0.5, 0.75]
     },
     belonging: {
       left: ['Contributor User', 'VCSE', 'Local Community'],
       right: ['User'],
-      color: [240, 74, 23],
-      core: [255, 210, 162],
+      color: [237, 75, 0],
+      core: [255, 182, 92],
       count: 150,
       leftY: [0.25, 0.5, 0.75],
       rightY: [0.5],
@@ -3829,8 +7709,8 @@
     feedback: {
       left: ['User'],
       right: ['User data', 'NHS', 'VCSE', 'Local community'],
-      color: [240, 74, 23],
-      core: [255, 210, 162],
+      color: [237, 75, 0],
+      core: [255, 182, 92],
       count: 140,
       leftY: [0.5],
       rightY: [0.16, 0.38, 0.62, 0.84],
@@ -3856,15 +7736,197 @@
         { label: 'James', side: 'R', y: 0.88, xOffset: -26 }
       ],
       major: ['Arthur', 'Jahanara', 'Elena', 'Mark', 'James'],
-      color: [78, 145, 255],
-      core: [178, 214, 255],
+      color: [0, 73, 255],
+      core: [174, 207, 255],
       count: 105,
       allOut: true
     }
   };
   let algoSketch = null;
 
+  const SVG_ALGO_MODES = {
+    workerSplit: {
+      tone: 'orange',
+      left: ['NHS', 'GP', 'LOTI'],
+      right: ['USER DATA', 'VCSE', 'LOCAL COMMUNITY'],
+      y: [0.2, 0.5, 0.8]
+    },
+    connect: {
+      tone: 'orange',
+      left: ['NHS', 'GP', 'LOTI'],
+      right: ['USER DATA', 'VCSE', 'LOCAL COMMUNITY'],
+      y: [0.2, 0.5, 0.8]
+    },
+    belonging: {
+      tone: 'orange',
+      left: ['CONTRIBUTOR USER', 'VCSE', 'LOCAL COMMUNITY'],
+      right: ['USER'],
+      y: [0.22, 0.5, 0.78]
+    },
+    feedback: {
+      tone: 'orange',
+      left: ['USER'],
+      right: ['USER DATA', 'NHS', 'VCSE', 'LOCAL COMMUNITY'],
+      y: [0.2, 0.42, 0.64, 0.82]
+    },
+    publish: {
+      tone: 'blue',
+      left: ['YOON', 'ARTHUR', 'MAYA', 'KIM', 'SAMIR'],
+      right: ['JAHANARA', 'ELENA', 'MARK', 'THEO', 'JAMES'],
+      y: [0.14, 0.3, 0.46, 0.62, 0.78]
+    }
+  };
+
+  function clearSvgAlgoViz() {
+    const overlay = document.getElementById('algo-overlay');
+    const layer = overlay?.querySelector('.live-algo-layer');
+    if (!overlay || !layer) return;
+    layer.classList.remove('visible');
+    setTimeout(() => {
+      if (!layer.classList.contains('visible')) layer.remove();
+    }, 480);
+  }
+
+  function makeSvgAlgoPath(svg, id, d, className, delay, duration = 5.1) {
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('id', id);
+    path.setAttribute('d', d);
+    path.setAttribute('pathLength', '1');
+    path.setAttribute('class', className);
+    path.style.animationDelay = delay + 'ms, ' + (delay + 2150) + 'ms';
+    svg.appendChild(path);
+
+    const flowVariants = [
+      { extraDelay: 0.72, extraDuration: 0.45, width: 2.7, dash: '118 22 16 54 7 520', start: 680, end: -660 },
+      { extraDelay: 1.84, extraDuration: 1.08, width: 1.55, dash: '62 38 12 640', start: 720, end: -620 },
+      { extraDelay: 3.02, extraDuration: -0.22, width: 2.15, dash: '88 18 11 42 6 560', start: 620, end: -720 }
+    ];
+
+    flowVariants.forEach((variant, i) => {
+      const flow = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      flow.setAttribute('d', d);
+      flow.setAttribute('class', className.replace('live-algo-curve', 'live-algo-flow'));
+      flow.style.setProperty('--flow-width', (className.includes('faint') ? variant.width * 0.72 : variant.width) + 'px');
+      flow.style.setProperty('--flow-dash', variant.dash);
+      flow.style.setProperty('--flow-start', variant.start);
+      flow.style.setProperty('--flow-end', variant.end);
+      flow.style.setProperty('--flow-duration', Math.max(4.8, duration + variant.extraDuration + i * 0.18).toFixed(2) + 's');
+      flow.style.animationDelay = ((delay / 1000) + variant.extraDelay + i * 0.09).toFixed(2) + 's';
+      svg.appendChild(flow);
+    });
+  }
+
+  function renderSvgAlgoViz(mode = 'connect') {
+    const overlay = document.getElementById('algo-overlay');
+    const frame = document.querySelector('.phone-frame:not(.worker-phone-frame)');
+    if (!overlay || !frame) return;
+    if (algoSketch) {
+      algoSketch.remove();
+      algoSketch = null;
+    }
+
+    const svgMode = mode === 'workerSplit' ? 'connect' : mode;
+    const cfg = SVG_ALGO_MODES[svgMode] || SVG_ALGO_MODES.connect;
+    const blue = cfg.tone === 'blue';
+    const rect = frame.getBoundingClientRect();
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    const layer = document.createElement('div');
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    layer.className = 'live-algo-layer';
+    svg.setAttribute('class', 'live-algo-svg');
+    svg.setAttribute('viewBox', '0 0 ' + w + ' ' + h);
+    layer.appendChild(svg);
+    overlay.replaceChildren(layer);
+    overlay.style.opacity = '1';
+
+    const leftX = Math.max(112, rect.left - 292);
+    const rightX = Math.min(w - 356, rect.right + 220);
+    const phoneCenterX = rect.left + rect.width * 0.5;
+    const phoneCenterY = rect.top + rect.height * 0.49;
+    const targets = [
+      [phoneCenterX, phoneCenterY],
+      [rect.left + rect.width * 0.2, rect.top + rect.height * 0.35],
+      [rect.left + rect.width * 0.8, rect.top + rect.height * 0.63],
+      [rect.left + rect.width * 0.45, rect.top + rect.height * 0.78]
+    ];
+    let pathCount = 0;
+
+    const makeLabel = (text, x, y, side, index) => {
+      const label = document.createElement('span');
+      label.className = 'live-algo-label' + (blue ? ' blue' : '') + (side === 'L' ? ' from-left' : '');
+      label.textContent = text;
+      label.style.left = x + 'px';
+      label.style.top = y + 'px';
+      layer.appendChild(label);
+
+      const startX = side === 'L' ? x + 16 : x - 14;
+      const startY = y + 7;
+      [0, 1, 2].forEach((lane) => {
+        const target = targets[(index + lane) % targets.length];
+        const endX = target[0] + (side === 'L' ? -18 : 18) + (lane - 1) * 16;
+        const endY = target[1] + (lane - 1) * 46;
+        const dx = endX - startX;
+        const controlX1 = startX + dx * 0.34;
+        const controlX2 = startX + dx * 0.66;
+        const sway = (side === 'L' ? -1 : 1) * (28 + lane * 18);
+        const publishMixedDirection = svgMode === 'publish' && (
+          (side === 'L' && (index + lane) % 3 === 1) ||
+          (side === 'R' && (index + lane) % 3 !== 1)
+        );
+        const flowFromPhone = (side === 'R' && (svgMode === 'belonging' || svgMode === 'feedback')) || publishMixedDirection;
+        const d = flowFromPhone
+          ? 'M ' + endX.toFixed(1) + ' ' + endY.toFixed(1) +
+            ' C ' + controlX2.toFixed(1) + ' ' + (endY - sway).toFixed(1) +
+            ', ' + controlX1.toFixed(1) + ' ' + (startY + sway).toFixed(1) +
+            ', ' + startX.toFixed(1) + ' ' + startY.toFixed(1)
+          : 'M ' + startX.toFixed(1) + ' ' + startY.toFixed(1) +
+            ' C ' + controlX1.toFixed(1) + ' ' + (startY + sway).toFixed(1) +
+            ', ' + controlX2.toFixed(1) + ' ' + (endY - sway).toFixed(1) +
+            ', ' + endX.toFixed(1) + ' ' + endY.toFixed(1);
+        const className = 'live-algo-curve' + (blue ? ' blue' : '') + (lane === 2 ? ' faint' : '');
+        const delay = 320 + index * 280 + lane * 190;
+        makeSvgAlgoPath(
+          svg,
+          'live-path-' + svgMode + '-' + (pathCount++),
+          d,
+          className,
+          delay,
+          5.1 + lane * 0.72
+        );
+      });
+
+      setTimeout(() => label.classList.add('visible'), 430 + index * 280);
+    };
+
+    cfg.left.forEach((text, i) => {
+      const frac = cfg.y[i] ?? 0.5;
+      makeLabel(text, leftX, rect.top + rect.height * frac, 'L', i);
+    });
+    cfg.right.forEach((text, i) => {
+      const denom = Math.max(cfg.right.length - 1, 1);
+      const frac = cfg.right.length === 1 ? 0.5 : 0.18 + (i / denom) * 0.64;
+      makeLabel(text, rightX, rect.top + rect.height * (cfg.y[i] ?? frac), 'R', i + cfg.left.length);
+    });
+
+    requestAnimationFrame(() => layer.classList.add('visible'));
+  }
+
   function triggerAlgoViz(mode = 'connect') {
+    if (document.body.classList.contains('pv-showcase-mini')) {
+      const overlayDiv = document.getElementById('algo-overlay');
+      if (overlayDiv) {
+        overlayDiv.style.opacity = '0';
+        overlayDiv.innerHTML = '';
+      }
+      if (algoSketch) {
+        algoSketch.remove();
+        algoSketch = null;
+      }
+      return;
+    }
+    renderSvgAlgoViz(mode);
+    return;
     const cfg = ALGO_MODES[mode] || ALGO_MODES.connect;
     const overlayDiv = document.getElementById('algo-overlay');
     if (overlayDiv) overlayDiv.style.opacity = '1';
@@ -3890,7 +7952,8 @@
         pg.strokeCap(pg.ROUND);
         pg.strokeJoin(pg.ROUND);
 
-        const frame = document.querySelector('.phone-frame');
+        const frame = document.querySelector('.phone-frame:not(.worker-phone-frame)');
+        const workerFrame = document.querySelector('.worker-phone-frame');
         const fr = frame.getBoundingClientRect();
         const pL = fr.left, pR = fr.right, pT = fr.top, pB = fr.bottom;
         const pW = pR - pL;
@@ -3898,17 +7961,49 @@
         const pCX = pL + pW / 2;
         const pCY = pT + pH / 2;
 
-        const lx   = pL - p.width * 0.26;
-        const rx   = pR + p.width * 0.26;
+        const lx   = pL - 320;
+        const rx   = pR + 320;
 
         anchors = [];
-        if (cfg.points) {
+        if (cfg.split && workerFrame) {
+          const wr = workerFrame.getBoundingClientRect();
+          const wL = wr.left, wR = wr.right, wT = wr.top, wB = wr.bottom;
+          const wH = wB - wT;
+          const leftX = Math.max(150, pL - 320);
+          const rightX = Math.min(p.width - 150, wR + 320);
+          cfg.left.forEach((label, i) => {
+            anchors.push({
+              x: leftX,
+              y: pT + pH * cfg.y[i],
+              side: 'L',
+              label,
+              flow: 'in',
+              targetLeft: pL,
+              targetRight: pR,
+              targetTop: pT,
+              targetHeight: pH
+            });
+          });
+          cfg.right.forEach((label, i) => {
+            anchors.push({
+              x: rightX,
+              y: wT + wH * cfg.y[i],
+              side: 'R',
+              label,
+              flow: 'in',
+              targetLeft: wL,
+              targetRight: wR,
+              targetTop: wT,
+              targetHeight: wH
+            });
+          });
+        } else if (cfg.points) {
           cfg.points.forEach((item) => {
             const baseX = item.side === 'L' ? lx : rx;
             const x = baseX + item.xOffset;
             const y = pT + pH * item.y;
             anchors.push({
-              x: Math.max(68, Math.min(p.width - 68, x)),
+              x: Math.max(150, Math.min(p.width - 150, x)),
               y: Math.max(58, Math.min(p.height - 58, y)),
               side: item.side,
               label: item.label,
@@ -3919,10 +8014,10 @@
           const leftY = cfg.leftY || (cfg.left.length === 1 ? [0.5] : cfg.y);
           const rightY = cfg.rightY || cfg.y;
           cfg.left.forEach((label, i) => {
-            anchors.push({ x: lx, y: pT + pH * leftY[i], side: 'L', label, flow: cfg.allOut ? 'out' : 'in' });
+            anchors.push({ x: Math.max(150, lx), y: pT + pH * leftY[i], side: 'L', label, flow: cfg.allOut ? 'out' : 'in' });
           });
           cfg.right.forEach((label, i) => {
-            anchors.push({ x: rx, y: pT + pH * rightY[i], side: 'R', label, flow: (cfg.allOut || cfg.rightOut) ? 'out' : 'in' });
+            anchors.push({ x: Math.min(p.width - 150, rx), y: pT + pH * rightY[i], side: 'R', label, flow: (cfg.allOut || cfg.rightOut) ? 'out' : 'in' });
           });
         }
 
@@ -3930,10 +8025,14 @@
           const rand = srand(ai * 77771 + 13);
           for (let k = 0; k < cfg.count; k++) {
             const isOut = anc.flow === 'out';
-            const phoneY = cfg.points ? pT + pH * (0.08 + rand() * 0.84) : pT + rand() * pH;
+            const targetTop = anc.targetTop ?? pT;
+            const targetHeight = anc.targetHeight ?? pH;
+            const phoneY = cfg.points ? pT + pH * (0.08 + rand() * 0.84) : targetTop + rand() * targetHeight;
             const phoneX = cfg.points
               ? (anc.side === 'L' ? pL - rand() * 8 : pR + rand() * 8)
-              : (anc.side === 'L' ? pL - rand() * 4 : pR + rand() * 4);
+              : (anc.targetLeft !== undefined
+                ? (anc.side === 'L' ? anc.targetLeft - rand() * 4 : anc.targetRight + rand() * 4)
+                : (anc.side === 'L' ? pL - rand() * 4 : pR + rand() * 4));
             const anchorX = anc.x + (rand() - 0.5) * 18;
             const anchorY = anc.y + (rand() - 0.5) * 14;
             const sx = isOut ? phoneX : anchorX;
@@ -3982,15 +8081,15 @@
 
             // outer glow
             pg.stroke(cfg.color[0], cfg.color[1], cfg.color[2], st.alpha * 0.25);
-            pg.strokeWeight(st.weight * 3.5);
+            pg.strokeWeight(st.weight * 3.85);
             pg.line(px0, py0, px1, py1);
             // mid glow
             pg.stroke(cfg.color[0], cfg.color[1], cfg.color[2], st.alpha * 0.55);
-            pg.strokeWeight(st.weight * 1.2);
+            pg.strokeWeight(st.weight * 1.32);
             pg.line(px0, py0, px1, py1);
             // core
             pg.stroke(cfg.core[0], cfg.core[1], cfg.core[2], st.alpha * 1.4);
-            pg.strokeWeight(st.weight * 0.4);
+            pg.strokeWeight(st.weight * 0.44);
             pg.line(px0, py0, px1, py1);
 
             px0 = px1; py0 = py1;
@@ -4005,22 +8104,882 @@
           const anchorDelay = ai * 200 + (anc.side === 'R' ? (cfg.rightDelay || 0) : 0);
           const appear = Math.max(0, Math.min(1, (elapsed - anchorDelay - 300) / 500));
           if (appear <= 0) return;
+          const labelScale = 1.1;
           p.noStroke();
           p.fill(cfg.color[0], cfg.color[1], cfg.color[2], 200 * appear);
-          p.circle(anc.x, anc.y, 6);
+          p.circle(anc.x, anc.y, 6.6 * labelScale);
           p.fill(cfg.color[0], cfg.color[1], cfg.color[2], 35 * appear);
-          p.circle(anc.x, anc.y, 22);
+          p.circle(anc.x, anc.y, 24.2 * labelScale);
           p.textFont('JetBrains Mono, monospace');
-          p.textSize(cfg.major?.includes(anc.label) ? 15 : 11);
+          p.textSize((cfg.major?.includes(anc.label) ? 16.5 : 12.1) * labelScale);
           p.fill(cfg.color[0], cfg.color[1], cfg.color[2], 190 * appear);
-          if (anc.side === 'L') { p.textAlign(p.RIGHT, p.CENTER); p.text(anc.label, anc.x - 14, anc.y); }
-          else                   { p.textAlign(p.LEFT,  p.CENTER); p.text(anc.label, anc.x + 14, anc.y); }
+          if (anc.side === 'L') { p.textAlign(p.RIGHT, p.CENTER); p.text(anc.label, anc.x - 14 * labelScale, anc.y); }
+          else                   { p.textAlign(p.LEFT,  p.CENTER); p.text(anc.label, anc.x + 14 * labelScale, anc.y); }
         });
       };
 
       p.windowResized = function() { p.resizeCanvas(window.innerWidth, window.innerHeight); };
     });
   }
+
+  // ═══════════════════════════════════════════════════════
+  //  PANAVISION MODE
+  //  기본 linko13.html은 그대로 유지하고, ?panavision=1 또는 ?embed=...에서만 작동
+  // ═══════════════════════════════════════════════════════
+  (function initPanavisionMode() {
+    const params = new URLSearchParams(window.location.search);
+    const embedMode = params.get('embed');
+    const isPanavision = params.get('panavision') === '1';
+    const isLoopShowcase = params.get('loopshowcase') === '1';
+    const shouldLoop = params.get('loop') === '1';
+    const isShowcaseMini = params.get('showcasemin') === '1';
+    const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+    function addStyle(id, css) {
+      if (document.getElementById(id)) return;
+      const style = document.createElement('style');
+      style.id = id;
+      style.textContent = css;
+      document.head.appendChild(style);
+    }
+
+    function basePathForIframe(query) {
+      const clean = window.location.pathname.split('/').pop() || 'linko13.html';
+      return `${clean}${query}`;
+    }
+
+    function playLoopingVideo() {
+      const video = document.querySelector('video');
+      if (!video) return;
+      video.muted = true;
+      video.loop = true;
+      video.play?.().catch(() => {});
+    }
+
+    async function setupEmbedMode(mode) {
+      document.body.classList.add('pv-embed', `pv-embed-${mode}`);
+      addStyle('panavisionEmbedStyle', `
+        html, body {
+          width: 100% !important;
+          height: 100% !important;
+          min-height: 100% !important;
+          margin: 0 !important;
+          overflow: hidden !important;
+          background: #000 !important;
+        }
+        body.pv-embed {
+          display: grid !important;
+          place-items: center !important;
+        }
+        body.pv-embed-live {
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          background: #000 !important;
+        }
+        body.pv-embed-live #seqLabel {
+          display: block !important;
+        }
+        body.pv-embed-live #algo-overlay {
+          display: block !important;
+        }
+        body.pv-embed .phone-wrapper {
+          margin: 0 !important;
+          transform: scale(0.88) !important;
+          transform-origin: center center !important;
+        }
+        body.pv-embed-live .phone-wrapper {
+          transform: scale(1.04) !important;
+          transition: transform 1.35s cubic-bezier(0.22,1,0.36,1) !important;
+        }
+        body.pv-embed-live.pv-live-shifted .phone-wrapper {
+          transform: translateX(-760px) scale(1.04) !important;
+        }
+        body.pv-embed-worker .phone-frame:not(.worker-phone-frame) {
+          display: none !important;
+        }
+        body.pv-embed-worker .worker-phone-frame {
+          display: block !important;
+          position: relative !important;
+          left: auto !important;
+          top: auto !important;
+          transform: none !important;
+          opacity: 1 !important;
+          visibility: visible !important;
+          pointer-events: auto !important;
+        }
+        body.pv-embed-worker .phone-wrapper {
+          justify-content: center !important;
+          align-items: center !important;
+        }
+        body.pv-showcase-mini #seqLabel,
+        body.pv-showcase-mini .split-sequence-labels {
+          display: none !important;
+        }
+        body.pv-showcase-mini.pv-embed-onboarding #s1 {
+          background: #fff !important;
+        }
+        body.pv-showcase-mini .phone-frame {
+          box-shadow:
+            inset 6px 0 9px rgba(255,255,255,0.24),
+            inset -8px 0 14px rgba(0,0,0,0.48),
+            inset 0 3px 5px rgba(255,255,255,0.26),
+            inset 0 -7px 15px rgba(0,0,0,0.36),
+            0 0 0 1px rgba(255,255,255,0.52),
+            0 0 0 2px rgba(0,0,0,0.78),
+            0 12px 22px rgba(0,0,0,0.22),
+            0 24px 36px rgba(0,0,0,0.16) !important;
+          filter: none !important;
+        }
+        body.pv-showcase-mini .stack-card,
+        body.pv-showcase-mini .worker-card,
+        body.pv-showcase-mini .host-intro-card,
+        body.pv-showcase-mini .activity-detail-card,
+        body.pv-showcase-mini .location-detail-card,
+        body.pv-showcase-mini .action-group,
+        body.pv-showcase-mini .ux-modal,
+        body.pv-showcase-mini .chat-sheet,
+        body.pv-showcase-mini .feedback-card,
+        body.pv-showcase-mini .progress-card,
+        body.pv-showcase-mini .create-card {
+          backdrop-filter: blur(6px) saturate(1.05) !important;
+          -webkit-backdrop-filter: blur(6px) saturate(1.05) !important;
+        }
+        body.pv-showcase-mini .stack-cards.is-expanded .stack-card:not(.expanded),
+        body.pv-showcase-mini .stack-cards.prefs-expanded .rec-card-shell,
+        body.pv-showcase-mini .worker-cards.is-expanded .worker-card:not(.expanded),
+        body.pv-showcase-mini .worker-cards.prefs-expanded .worker-card:not(.expanded),
+        body.pv-showcase-mini .stack-card.dimmed,
+        body.pv-showcase-mini .worker-card.dimmed {
+          opacity: 0.32 !important;
+          visibility: visible !important;
+          pointer-events: none !important;
+          transform: none !important;
+          filter: saturate(0.94) brightness(0.98) !important;
+        }
+        body.pv-showcase-mini .rec-card-shell.expanded,
+        body.pv-showcase-mini .preference-card.expanded,
+        body.pv-showcase-mini .worker-card.expanded {
+          opacity: 1 !important;
+          visibility: visible !important;
+        }
+        body.pv-showcase-mini .ux-modal-backdrop,
+        body.pv-showcase-mini .chat-sheet-backdrop {
+          background: rgba(0,11,31,0.16) !important;
+          backdrop-filter: blur(8px) saturate(1.08) !important;
+          -webkit-backdrop-filter: blur(8px) saturate(1.08) !important;
+        }
+      `);
+      if (isShowcaseMini) document.body.classList.add('pv-showcase-mini');
+
+      await wait(80);
+      if (mode === 'live') {
+        runPanavisionLiveSequence();
+        return;
+      }
+      if (mode === 'onboarding') {
+        goTo('s1');
+        updateSeqLabel('ONBOARDING');
+        const logo = document.getElementById('splashLogo');
+        if (logo) {
+          logo.src = 'LinkoLogo.png';
+          logo.style.transition = 'none';
+          logo.style.opacity = '1';
+        }
+        if (shouldLoop) startEmbedLoop(mode);
+        return;
+      }
+      await wait(180);
+      if (mode === 'one') {
+        goTo('s2');
+        if (shouldLoop) startEmbedLoop(mode);
+        return;
+      }
+      if (mode === 'algorithm') {
+        goTo('s2');
+        await wait(160);
+        onBigBtn();
+        if (shouldLoop) startEmbedLoop(mode);
+        return;
+      }
+      if (mode === 'choice-activity') {
+        goTo('s2');
+        await wait(120);
+        showMapOverlay();
+        updateSeqLabel('WITH LINKO');
+        if (shouldLoop) startEmbedLoop(mode);
+        return;
+      }
+      if (mode === 'choice-worker') {
+        goTo('s2');
+        await wait(120);
+        showMapOverlay();
+        updateSeqLabel('WITH LINKO');
+        if (shouldLoop) startEmbedLoop('choice-activity');
+        return;
+      }
+      if (mode === 'confirm') {
+        openDetail(0);
+        if (shouldLoop) startEmbedLoop(mode);
+        return;
+      }
+      if (mode === 'worker-match') {
+        openLinkWorkerMatched(1);
+        if (shouldLoop) startEmbedLoop(mode);
+        return;
+      }
+      if (mode === 'belong') {
+        openDetail(0);
+        await wait(120);
+        goToJoin();
+        await wait(650);
+        playLoopingVideo();
+        if (shouldLoop) startEmbedLoop(mode);
+        return;
+      }
+      if (mode === 'feedback') {
+        goTo('s8');
+        startFeedbackAnimation();
+        if (shouldLoop) startEmbedLoop(mode);
+        return;
+      }
+      if (mode === 'progress') {
+        goTo('s9');
+        animateCreditsAdded();
+        if (shouldLoop) startEmbedLoop(mode);
+        return;
+      }
+      if (mode === 'host') {
+        goTo('s10');
+        resetCreatePage();
+        if (shouldLoop) startEmbedLoop(mode);
+        return;
+      }
+      if (mode === 'start') {
+        goTo('s10');
+        await wait(220);
+        publishLinko();
+        if (shouldLoop) startEmbedLoop(mode);
+        return;
+      }
+      if (mode === 'final') {
+        goTo('s10');
+        await wait(180);
+        publishLinko();
+        await wait(1100);
+        finishPublishedLinko();
+      }
+    }
+
+    function clickText(text, scope = document) {
+      const buttons = Array.from(scope.querySelectorAll('button'));
+      const btn = buttons.find(item => item.textContent.trim() === text);
+      btn?.click();
+      return btn;
+    }
+
+    async function pressAndClick(target, hold = 250) {
+      const el = typeof target === 'string' ? document.querySelector(target) : target;
+      if (!el) return false;
+      const wasDisabled = el.disabled;
+      if (wasDisabled) {
+        el.disabled = false;
+        el.classList.remove('is-disabled');
+      }
+      el.classList.add('loop-pressed');
+      await wait(hold);
+      el.click();
+      el.classList.remove('loop-pressed');
+      if (wasDisabled) {
+        el.disabled = true;
+        el.classList.add('is-disabled');
+      }
+      return true;
+    }
+
+    async function pressText(text, scope = document, hold = 250) {
+      const buttons = Array.from(scope.querySelectorAll('button'));
+      const btn = buttons.find(item => item.textContent.trim() === text);
+      return pressAndClick(btn, hold);
+    }
+
+    async function pressLoopButton(target, hold = 1100) {
+      const el = typeof target === 'string' ? document.querySelector(target) : target;
+      if (!el) {
+        await wait(hold);
+        return;
+      }
+      const wasDisabled = el.disabled;
+      if (wasDisabled) el.disabled = false;
+      el.classList.add('loop-pressed');
+      await wait(hold);
+      el.classList.remove('loop-pressed');
+      if (wasDisabled) el.disabled = true;
+    }
+
+    function ensurePublishRadar() {
+      const stage = document.getElementById('publishStage');
+      if (!stage) return null;
+      let radar = stage.querySelector('.publish-radar-loop');
+      if (!radar) {
+        radar = document.createElement('div');
+        radar.className = 'publish-radar-loop';
+        radar.innerHTML = `
+          <span class="ring r1"></span>
+          <span class="ring r2"></span>
+          <span class="ring r3"></span>
+          <div class="publish-orbit-tags"></div>
+        `;
+        stage.insertBefore(radar, stage.querySelector('.publish-orb'));
+      }
+      return radar;
+    }
+
+    function showPublishRadarTags(radar) {
+      const cont = radar?.querySelector('.publish-orbit-tags');
+      if (!cont) return;
+      window.__publishRadarTagTimers?.forEach(timer => window.clearTimeout(timer));
+      window.__publishRadarTagTimers = [];
+      cont.innerHTML = '';
+
+      const CENTER = 140;
+      const RADIUS = 130;
+      const tagData = [
+        { label: '📍 Location', angle: 0 },
+        { label: '🏥 NHS', angle: 60 },
+        { label: '🤝 VCSE', angle: 120 },
+        { label: '🗺️ LOTI', angle: 180 },
+        { label: '♿ Accessibility', angle: 240 },
+        { label: '📋 Social Prescribing', angle: 300 }
+      ];
+
+      tagData.forEach((tag, i) => {
+        const timer = window.setTimeout(() => {
+          if (!radar.classList.contains('on')) return;
+          const rad = (tag.angle - 90) * Math.PI / 180;
+          const el = document.createElement('span');
+          el.className = 'orbit-tag';
+          el.textContent = tag.label;
+          el.style.left = (CENTER + Math.cos(rad) * RADIUS) + 'px';
+          el.style.top = (CENTER + Math.sin(rad) * RADIUS) + 'px';
+          cont.appendChild(el);
+          requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('visible')));
+        }, i * 450 + 360);
+        window.__publishRadarTagTimers.push(timer);
+      });
+    }
+
+    async function runStartHostingTapLoop() {
+      const orb = document.querySelector('.publish-orb');
+      const radar = ensurePublishRadar();
+      if (!orb || !radar) return;
+      radar.querySelector('.publish-orbit-tags')?.replaceChildren();
+      orb.classList.add('is-loop-tapping');
+      await wait(720);
+      radar.classList.add('on');
+      showPublishRadarTags(radar);
+      await wait(5600);
+      window.__publishRadarTagTimers?.forEach(timer => window.clearTimeout(timer));
+      window.__publishRadarTagTimers = [];
+      radar.classList.remove('on');
+      radar.querySelector('.publish-orbit-tags')?.replaceChildren();
+      orb.classList.remove('is-loop-tapping');
+    }
+
+    async function startEmbedLoop(mode) {
+      await wait(5000);
+      if (mode === 'onboarding') {
+        goTo('s1');
+        updateSeqLabel('ONBOARDING');
+        const logo = document.getElementById('splashLogo');
+        if (logo) {
+          logo.src = 'LinkoLogo.png';
+          logo.style.transition = 'opacity 0.8s ease';
+          logo.style.opacity = '1';
+        }
+        return;
+      }
+      if (mode === 'one') {
+        while (true) {
+          clickText('Flexible', document.getElementById('s2'));
+          await wait(900);
+          clickText('Outdoor', document.getElementById('s2'));
+          await wait(900);
+          clickText('Open group', document.getElementById('s2'));
+          await wait(900);
+          runLocalTapLoop();
+          await wait(6500);
+          resetS2();
+          await wait(2400);
+        }
+      }
+      if (mode === 'algorithm') {
+        while (true) {
+          await wait(5700);
+          exitWorkerMode({ stopLines: true });
+          resetS2();
+          updateSeqLabel('Recommendation Algorithm');
+          await wait(600);
+          onBigBtn();
+        }
+      }
+      if (mode === 'choice-activity') {
+        while (true) {
+          openPreferenceDetail();
+          await wait(3000);
+          document.querySelectorAll('.preference-card.expanded .segment-control button:not(.on)').forEach((btn, i) => {
+            if (i < 3) setTimeout(() => btn.click(), i * 360);
+          });
+          await wait(1800);
+          collapseStack();
+          await wait(2600);
+          openMapDetail(2);
+          await wait(3000);
+          replaceStackOption({ stopPropagation() {}, target: document.querySelector('#stackCards .rec-card-shell.expanded .btn-ghost') || document.body }, 2);
+          await wait(2600);
+          openMapDetail(1);
+          await wait(3000);
+          replaceStackOption({ stopPropagation() {}, target: document.querySelector('#stackCards .rec-card-shell.expanded .btn-ghost') || document.body }, 1);
+          await wait(2600);
+          openMapDetail(0);
+          await wait(3000);
+          await pressLoopButton('#stackCards .rec-card-shell.expanded .btn-primary', 1450);
+          await wait(2300);
+          collapseStack();
+          await wait(2400);
+        }
+      }
+      if (mode === 'choice-worker') {
+        return startEmbedLoop('choice-activity');
+      }
+      if (mode === 'confirm') {
+        while (true) {
+          openRatingPopup();
+          await wait(2100);
+          closeUxModal('ratingPopup');
+          await wait(750);
+          await smoothElementScroll('#s5 .detail-page', 330, 2100);
+          openMapPopup();
+          await wait(2200);
+          closeUxModal('mapPopup');
+          await wait(1000);
+          await pressLoopButton('#s5 .btn-primary', 1450);
+          await wait(2300);
+          document.querySelector('#s5 .detail-page').scrollTop = 0;
+          await wait(1400);
+        }
+      }
+      if (mode === 'worker-match') {
+        while (true) {
+          document.querySelectorAll('#matchedCommunities .community-item')[0]?.click();
+          await wait(1700);
+          closeUxModal('communityPopup');
+          await wait(750);
+          document.querySelectorAll('#matchedCommunities .community-item')[2]?.click();
+          await wait(1700);
+          closeUxModal('communityPopup');
+          await wait(750);
+          openWorkerChat();
+          await typeWorkerMessage();
+          await wait(450);
+          sendWorkerChat();
+          await wait(1900);
+          closeWorkerChat();
+          await wait(800);
+          await pressLoopButton('#s7 .btn-primary', 1450);
+          await wait(2300);
+        }
+      }
+      if (mode === 'belong') {
+        while (true) {
+          await smoothElementScroll('#s6 .booking-page', 160, 1400);
+          playLoopingVideo();
+          await wait(6200);
+          document.getElementById('completeActivityBtn')?.classList.remove('is-disabled');
+          await wait(950);
+          await pressLoopButton('#completeActivityBtn', 1450);
+          await wait(2300);
+          document.querySelector('#s6 .booking-page').scrollTop = 0;
+        }
+      }
+      if (mode === 'feedback') {
+        while (true) {
+          clickText('Good fit', document.getElementById('s8'));
+          await wait(950);
+          clickText('Smaller group', document.getElementById('s8'));
+          await wait(950);
+          clickText('Kind host', document.getElementById('s8'));
+          await wait(950);
+          clickText('Clear arrival', document.getElementById('s8'));
+          await wait(950);
+          document.getElementById('submitFeedbackBtn')?.classList.remove('is-disabled');
+          await pressLoopButton('#submitFeedbackBtn', 1450);
+          await wait(2300);
+          document.querySelectorAll('#s8 .feedback-chips button.on').forEach(btn => btn.classList.remove('on'));
+          await wait(1300);
+        }
+      }
+      if (mode === 'progress') {
+        while (true) {
+          animateCreditsAdded();
+          await wait(2100);
+          await smoothElementScroll('#s9 .flow-body', 340, 2100);
+          await wait(2900);
+          document.getElementById('createActivityBtn')?.classList.remove('is-disabled');
+          await wait(950);
+          await pressLoopButton('#createActivityBtn', 1450);
+          await wait(2300);
+          document.querySelector('#s9 .flow-body').scrollTop = 0;
+          await wait(1300);
+        }
+      }
+      if (mode === 'host') {
+        while (true) {
+          prepareHostIdeaEmpty();
+          await wait(950);
+          await typeHostIdea();
+          await wait(1050);
+          clickText('Social', document.getElementById('s10'));
+          await wait(750);
+          clickText('Any', document.getElementById('s10'));
+          await wait(750);
+          clickText('Open', document.getElementById('s10'));
+          await wait(950);
+          await pressLoopButton('#s10 .create-button', 1450);
+          await wait(2300);
+          resetCreatePage();
+          await wait(1000);
+        }
+      }
+      if (mode === 'start') {
+        while (true) {
+          await runStartHostingTapLoop();
+          await wait(2600);
+        }
+      }
+    }
+
+    function runLocalTapLoop() {
+      const btn = document.getElementById('bigBtn');
+      const label = document.getElementById('btnLabel');
+      const icon = document.getElementById('btnIcon');
+      const hint = document.getElementById('s2Hint');
+      const radar = document.getElementById('radarWrap');
+      const cLabel = document.getElementById('cLabel');
+      const intro = document.querySelector('.s2-intro');
+      const prefsPanel = document.getElementById('oneButtonPreferences');
+      if (!btn || !label || !icon || !radar || !cLabel) return;
+      btn.style.animation = 'none';
+      btn.style.transition = 'width 0.6s cubic-bezier(0.4,0,0.2,1), height 0.6s, border-radius 0.6s';
+      btn.style.width = '80px';
+      btn.style.height = '100px';
+      btn.style.borderRadius = '40px';
+      label.style.opacity = '0';
+      setTimeout(() => {
+        label.style.display = 'none';
+        icon.style.display = 'block';
+        icon.style.opacity = '1';
+      }, 360);
+      setTimeout(() => {
+        hint.style.opacity = '0';
+        if (intro) intro.style.opacity = '0';
+        if (prefsPanel) prefsPanel.style.opacity = '0';
+        radar.style.opacity = '1';
+        cLabel.style.opacity = '1';
+        startConnecting();
+        if (document.body.classList.contains('pv-showcase-mini')) {
+          window.clearTimeout(window.__connectOverlayTimer);
+        }
+      }, 620);
+    }
+
+    function smoothElementScroll(selector, targetTop, duration = 1200) {
+      const el = document.querySelector(selector);
+      if (!el) return Promise.resolve();
+      const start = el.scrollTop;
+      const diff = targetTop - start;
+      const startTime = performance.now();
+      return new Promise(resolve => {
+        function step(now) {
+          const t = Math.min((now - startTime) / duration, 1);
+          const ease = t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+          el.scrollTop = start + diff * ease;
+          if (t < 1) requestAnimationFrame(step);
+          else resolve();
+        }
+        requestAnimationFrame(step);
+      });
+    }
+
+    async function runPanavisionLiveSequence() {
+      await wait(2500);
+      document.body.classList.remove('pv-live-shifted');
+      await wait(900);
+      goTo('s2');
+      await wait(420);
+      await pressText('Flexible', document.getElementById('s2'));
+      await wait(650);
+      await pressText('Open group', document.getElementById('s2'));
+      await wait(650);
+      if (!(await pressAndClick('#bigBtn'))) onBigBtn();
+      await wait(1600);
+      showMapOverlay();
+      await wait(2600);
+      openMapDetail(0);
+      document.querySelectorAll('#workerCards .rec-card-shell').forEach(card => card.classList.remove('dimmed'));
+      await wait(3000);
+      if (!(await pressAndClick('#stackCards .rec-card-shell.expanded .btn-primary', 280))) {
+        joinStackOption({ stopPropagation() {} }, 0);
+      }
+      await wait(2300);
+      if (!(await pressAndClick('#s5 .btn-primary', 280))) goToJoin();
+      await wait(580);
+      playLoopingVideo();
+      await wait(15500);
+      if (!(await pressAndClick('#completeActivityBtn', 280))) completeActivity();
+      await wait(5600);
+      if (!(await pressAndClick('#submitFeedbackBtn', 280))) submitFeedback();
+      if (!document.getElementById('s9')?.classList.contains('active')) goTo('s9');
+      await wait(6500);
+      if (!(await pressAndClick('#createActivityBtn', 280))) goTo('s10');
+      await wait(6000);
+      if (!(await pressAndClick('#s10 .create-button', 280))) publishLinko();
+      await wait(5200);
+      if (!(await pressAndClick('#s10 .publish-orb', 280))) finishPublishedLinko();
+    }
+
+    function createPanavisionShell() {
+      document.body.classList.add('pv-parent');
+      addStyle('panavisionParentStyle', `
+        html, body {
+          width: 100% !important;
+          height: 100% !important;
+          min-height: 100% !important;
+          margin: 0 !important;
+          overflow: hidden !important;
+          background: #0b0b0b !important;
+        }
+        body.pv-parent > #algo-overlay,
+        body.pv-parent > .phone-wrapper {
+          display: none !important;
+        }
+        .pv-stage {
+          position: fixed;
+          inset: 0;
+          width: 100vw;
+          height: 100vh;
+          overflow: hidden;
+          background: #000;
+          color: #fff;
+          z-index: 99999;
+        }
+        .pv-stage iframe {
+          border: 0 !important;
+          outline: 0 !important;
+        }
+        .pv-live {
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 100vw;
+          height: 100vh;
+          overflow: visible;
+          background: transparent;
+          box-shadow: none;
+          z-index: 1;
+        }
+        .pv-live::before,
+        .pv-snap::before,
+        .pv-choice::before {
+          content: none;
+        }
+        .pv-live iframe {
+          width: 100vw;
+          height: 100vh;
+          border-radius: 0;
+        }
+        .pv-track {
+          position: absolute;
+          left: 1500px;
+          right: 10px;
+          top: 332px;
+          height: 400px;
+          display: flex;
+          align-items: center;
+          gap: 14px;
+          z-index: 4;
+        }
+        .pv-snap,
+        .pv-choice {
+          position: relative;
+          flex: 0 0 auto;
+          opacity: 0;
+          transform: translateX(-34px) scale(0.9);
+          filter: blur(5px);
+          transition: opacity 0.76s ease, transform 0.76s cubic-bezier(.2,.82,.2,1), filter 0.76s ease;
+        }
+        .pv-snap.show,
+        .pv-choice.show {
+          opacity: 1;
+          transform: translateX(0) scale(1);
+          filter: blur(0);
+        }
+        .pv-snap {
+          width: 150px;
+          height: 325px;
+        }
+        .pv-choice {
+          width: 150px;
+          height: 400px;
+          margin-right: 6px;
+        }
+        .pv-mini {
+          position: absolute;
+          inset: 0;
+          width: 150px;
+          height: 325px;
+          overflow: hidden;
+          border-radius: 21px;
+          background: transparent;
+          box-shadow: none;
+        }
+        .pv-snap .pv-mini {
+          position: relative;
+        }
+        .pv-choice .pv-mini:first-child {
+          left: 0;
+          top: 0;
+          z-index: 2;
+        }
+        .pv-choice .pv-mini:last-child {
+          left: 108px;
+          top: 66px;
+          z-index: 1;
+        }
+        .pv-mini iframe {
+          width: 390px;
+          height: 844px;
+          transform: scale(0.385);
+          transform-origin: left top;
+        }
+      `);
+
+      const stage = document.createElement('main');
+      stage.className = 'pv-stage';
+      stage.innerHTML = `
+        <section class="pv-live" data-label="Live UX">
+          <iframe src="${basePathForIframe('?embed=live')}" title="Live Linko UX"></iframe>
+        </section>
+        <section class="pv-track">
+          <article class="pv-snap" id="pv-one" data-label="One Button">
+            <div class="pv-mini"><iframe src="${basePathForIframe('?embed=one')}" title="One Button"></iframe></div>
+          </article>
+          <article class="pv-choice" id="pv-choice" data-label="Choose How You Want To Connect">
+            <div class="pv-mini"><iframe src="${basePathForIframe('?embed=choice-activity')}" title="Activity Match"></iframe></div>
+          </article>
+          <article class="pv-snap" id="pv-confirm" data-label="Activity Confirm">
+            <div class="pv-mini"><iframe src="${basePathForIframe('?embed=confirm')}" title="Activity Confirm"></iframe></div>
+          </article>
+          <article class="pv-snap" id="pv-belong" data-label="Belonging">
+            <div class="pv-mini"><iframe src="${basePathForIframe('?embed=belong')}" title="Belonging"></iframe></div>
+          </article>
+          <article class="pv-snap" id="pv-feedback" data-label="Feedback">
+            <div class="pv-mini"><iframe src="${basePathForIframe('?embed=feedback')}" title="Feedback"></iframe></div>
+          </article>
+          <article class="pv-snap" id="pv-progress" data-label="Progress Tracking">
+            <div class="pv-mini"><iframe src="${basePathForIframe('?embed=progress')}" title="Progress Tracking"></iframe></div>
+          </article>
+          <article class="pv-snap" id="pv-host" data-label="Become a Host">
+            <div class="pv-mini"><iframe src="${basePathForIframe('?embed=host')}" title="Become a host"></iframe></div>
+          </article>
+          <article class="pv-snap" id="pv-start" data-label="Start Hosting">
+            <div class="pv-mini"><iframe src="${basePathForIframe('?embed=start')}" title="Start hosting"></iframe></div>
+          </article>
+        </section>
+      `;
+      document.body.appendChild(stage);
+
+      setTimeout(() => stage.classList.add('started'), 200);
+      [
+        ['pv-one', 3800],
+        ['pv-choice', 8400],
+        ['pv-confirm', 15200],
+        ['pv-belong', 18400],
+        ['pv-feedback', 34600],
+        ['pv-progress', 42000],
+        ['pv-host', 50400],
+        ['pv-start', 58000],
+      ].forEach(([id, delay]) => {
+        setTimeout(() => document.getElementById(id)?.classList.add('show'), delay);
+      });
+    }
+
+    function createLoopShowcaseShell() {
+      document.body.classList.add('pv-parent');
+      document.body.querySelector('#algo-overlay')?.remove();
+      document.body.querySelector('.phone-wrapper')?.remove();
+      const singleScene = (mode, title, extraClass = '') => `
+        <article class="loop-showcase-card ${extraClass}">
+          <div class="loop-showcase-title">${title}</div>
+          <div class="loop-showcase-frame">
+            <iframe src="${basePathForIframe(`?embed=${mode}&loop=1&showcasemin=1`)}" title="${title}"></iframe>
+          </div>
+        </article>
+      `;
+      const stage = document.createElement('main');
+      stage.className = 'loop-showcase-stage';
+      stage.innerHTML = `
+        ${singleScene('onboarding', 'ONBOARDING')}
+        ${singleScene('one', 'ONE BUTTON TO CONNECT')}
+        ${singleScene('choice-activity', 'WITH LINKO')}
+        <section class="loop-showcase-pair match" aria-label="Match options">
+          ${singleScene('confirm', 'ACTIVITY CONFIRM')}
+          ${singleScene('worker-match', 'LINK WORKER MATCHED')}
+        </section>
+        ${singleScene('belong', 'BELONGING')}
+        ${singleScene('feedback', 'FEEDBACK')}
+        ${singleScene('progress', 'PROGRESS TRACKING')}
+        ${singleScene('host', 'BECOME A HOST')}
+        ${singleScene('start', 'START HOSTING', 'start-card')}
+      `;
+      document.body.appendChild(stage);
+    }
+
+    if (embedMode) {
+      window.addEventListener('load', () => setupEmbedMode(embedMode));
+      return;
+    }
+    if (isLoopShowcase) {
+      createLoopShowcaseShell();
+      return;
+    }
+    if (isPanavision) {
+      window.addEventListener('load', createPanavisionShell);
+    }
+  })();
+
+  (function initLinko16CaptureScale() {
+    const params = new URLSearchParams(window.location.search);
+    if (['embed', 'loopshowcase', 'panavision'].some(key => params.has(key))) return;
+
+    const PHONE_W = 410;
+    const PHONE_H = 864;
+    const LABEL_EXTRA_H = 46;
+    const MARGIN = 0.035;
+    const MAX_SCALE = 1.08;
+
+    function scalePhoneWrapper() {
+      const wrapper = document.querySelector('.phone-wrapper');
+      if (!wrapper) return;
+      const availW = window.innerWidth * (1 - MARGIN * 2);
+      const availH = window.innerHeight * (1 - MARGIN * 2);
+      const scale = Math.min(MAX_SCALE, availW / PHONE_W, availH / (PHONE_H + LABEL_EXTRA_H));
+      wrapper.style.transform = `scale(${scale.toFixed(4)})`;
+    }
+
+    scalePhoneWrapper();
+    window.addEventListener('resize', scalePhoneWrapper);
+  })();
 
 </script>
 </body>
